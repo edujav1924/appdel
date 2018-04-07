@@ -1,6 +1,8 @@
 package com.example.edu.delivery;
 
 import android.annotation.SuppressLint;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -28,17 +31,18 @@ import java.util.ArrayList;
 import static android.widget.Toast.LENGTH_LONG;
 
 public class ScrollingActivity extends AppCompatActivity {
+    ImageView logo;
     NumberPicker numberPicker;
     ListView pedidos_seleccionados;
     TextView total_text;
+    Spinner categoria;
     ArrayList<String> pedido_list = new ArrayList<String>();
     ArrayList<Integer> precio_list = new ArrayList<Integer>();
-    ArrayList<Integer> cant_list = new ArrayList<Integer>();
+    ArrayList<Integer> cant_list = new ArrayList<>();
     ArrayList<String> pedido_list_spinner = new ArrayList<String>();
     ArrayList<String> precio_list_spinner = new ArrayList<String>();
     private int id_seleccion;
-    private String seleccion_user;
-    private int cant_pedido;
+
 
     @SuppressLint("WrongViewCast")
     @Override
@@ -55,19 +59,21 @@ public class ScrollingActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        categoria = findViewById(R.id.categoria);
         pedidos_seleccionados = findViewById(R.id.lista);
         total_text = findViewById(R.id.total);
+        logo = findViewById(R.id.logo);
         toolbars();
         spinners();
         numberpickers();
 
     }
     public void btn_agregar(View view){
-        if (id_seleccion!=0) {
+        int canti = numberPicker.getValue();
+        if (id_seleccion!=0 && canti!=0) {
 
             Integer precio = Integer.parseInt(precio_list_spinner.get(id_seleccion));
             String producto = pedido_list_spinner.get(id_seleccion);
-            int canti = numberPicker.getValue();
             if (!pedido_list.contains(producto)) {
                 precio_list.add(precio*canti);
                 pedido_list.add(producto);
@@ -90,21 +96,20 @@ public class ScrollingActivity extends AppCompatActivity {
             for (int i=0;i<pedido_list.size();i++){
                 total = total + precio_list.get(i);
             }
-            total_text.setText(String.valueOf(total)+" Gs.");
+            total_text.setText((String.valueOf(total)+" Gs."));
+            Snackbar.make(view, "Agregado", Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
 
         }
 
-
-
     }
     private void spinners() {
-        String[] countryNames = {"Seleccione", "Hamburguesa normal", "Hamburguesa completa", "coca cola"};
-        String[] subs = {"-----", "7000", "10000", "5000"};
+        String[] countryNames = {"Seleccione", "Hamburguesa normal", "Hamburguesa completa", "coca cola","lomito","papas fritas","cerveza","empanada"};
+        String[] subs = {"-----", "7000", "10000", "5000","15000","5000","8000","2000"};
         for (int i=0;i<countryNames.length;i++){
             pedido_list_spinner.add(countryNames[i]);
             precio_list_spinner.add(subs[i]);
         }
-        final Spinner categoria = findViewById(R.id.categoria);
         customadapterspinner adaptador = new customadapterspinner(this,pedido_list_spinner,precio_list_spinner);
         categoria.setAdapter(adaptador);
         categoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -121,6 +126,7 @@ public class ScrollingActivity extends AppCompatActivity {
     }
     private void toolbars(){
         final CollapsingToolbarLayout collapsingToolbarLayout =  findViewById(R.id.toolbar_layout);
+        final Toolbar tool = findViewById(R.id.toolbar);
         AppBarLayout appBarLayout =  findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = true;
@@ -131,11 +137,16 @@ public class ScrollingActivity extends AppCompatActivity {
                 if (scrollRange == -1) {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
-                if (scrollRange + verticalOffset <= 125) {
+                if (scrollRange + verticalOffset <= 127) {
                     collapsingToolbarLayout.setTitle("Delivery ON");
+
+                    logo.animate().alpha(0.0f).setDuration(500);
+
+
                     isShow = true;
                 } else if(isShow) {
-                    collapsingToolbarLayout.setTitle(" ");//carefull there should a space between double quote otherwise it wont work
+                    logo.animate().alpha(1.0f).setDuration(500);
+                    collapsingToolbarLayout.setTitle(" ");
                     isShow = false;
                 }
             }
@@ -154,7 +165,7 @@ public class ScrollingActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_scrolling, menu);
+        getMenuInflater().inflate(R.menu.custommenu, menu);
         return true;
     }
 

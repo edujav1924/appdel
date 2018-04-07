@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="false"
+    android:background="#61f5a000"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.edu.delivery.ScrollingActivity"
     tools:showIn="@layout/activity_scrolling">
@@ -31,6 +32,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
+                <ImageView
+                    android:id="@+id/logo"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@color/button_pressed"
+                    app:srcCompat="@drawable/delivery" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -48,7 +56,7 @@
                         android:textAlignment="center"
                         android:textAllCaps="false"
                         android:textColor="@android:color/holo_red_dark"
-                        android:textSize="30sp"
+                        android:textSize="24sp"
                         android:textStyle="bold"
                         android:typeface="monospace" />
 
@@ -63,7 +71,7 @@
                         android:text="Cantidad:"
                         android:textAlignment="center"
                         android:textColor="@android:color/holo_red_dark"
-                        android:textSize="30sp"
+                        android:textSize="24sp"
                         android:textStyle="bold"
                         android:typeface="monospace" />
                 </LinearLayout>
@@ -82,6 +90,10 @@
                         android:layout_centerVertical="true"
                         android:layout_toEndOf="@+id/text_producto"
                         android:layout_weight="1"
+                        android:backgroundTint="@color/colorPrimary"
+                        android:backgroundTintMode="add"
+                        android:descendantFocusability="blocksDescendants"
+                        android:dropDownWidth="match_parent"
                         android:spinnerMode="dialog" />
 
                     <com.shawnlin.numberpicker.NumberPicker
@@ -92,6 +104,7 @@
                         android:layout_centerInParent="false"
                         android:layout_toEndOf="@+id/text_cantidad"
                         android:layout_weight="1"
+                        android:animationCache="false"
                         android:gravity="center_vertical|center_horizontal|center"
                         android:orientation="horizontal"
                         app:np_dividerColor="@android:color/holo_orange_dark"
@@ -120,6 +133,7 @@
                         android:layout_centerHorizontal="true"
                         android:background="@drawable/button_background"
                         android:drawableLeft="@android:drawable/ic_input_add"
+                        android:fontFamily="@font/almendra"
                         android:onClick="btn_agregar"
                         android:text="Agregar"
                         android:textAlignment="center"
@@ -135,6 +149,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
+                    android:background="@drawable/customborderright"
                     android:gravity="center_vertical|center_horizontal|center"
                     android:orientation="horizontal">
 
@@ -142,24 +157,30 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_weight="1"
+                        android:fontFamily="@font/almendra"
                         android:gravity="center"
                         android:text="Producto"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textSize="18sp" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_weight="1"
+                        android:fontFamily="@font/almendra"
+                        android:gravity="center"
+                        android:text="Cantidad"
+                        android:textAlignment="center"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/almendra"
                         android:gravity="center"
                         android:text="Precio"
-                        android:textAlignment="center" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="Cantidad" />
+                        android:textSize="18sp" />
 
                 </LinearLayout>
 
@@ -175,16 +196,21 @@
 
                     <ListView
                         android:id="@+id/lista"
+                        style="@style/Widget.AppCompat.ListView.Menu"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
-                        android:layout_marginTop="18dp" />
+                        android:divider="@color/table"
+                        android:dividerHeight="2dp"
+                        android:footerDividersEnabled="false"
+                        android:headerDividersEnabled="false"
+                        android:scrollbars="vertical" />
                 </RelativeLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="35dp"
                     android:layout_marginTop="10dp"
                     android:background="@android:color/darker_gray"
                     android:orientation="horizontal">
@@ -192,19 +218,26 @@
                     <TextView
                         android:id="@+id/textView2"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
+                        android:background="@color/button_default"
+                        android:fontFamily="@font/almendra"
+                        android:gravity="center"
                         android:text="Precio Total:"
                         android:textAlignment="center"
+                        android:textColor="@color/white"
                         android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/total"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
+                        android:background="@color/colorPrimary"
+                        android:gravity="center"
                         android:text="0"
                         android:textAlignment="center"
+                        android:textColor="@color/white"
                         android:textSize="18sp" />
 
                 </LinearLayout>
