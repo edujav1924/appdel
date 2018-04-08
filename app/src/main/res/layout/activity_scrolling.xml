@@ -60,15 +60,4 @@
         android:id="@+id/include"
         layout="@layout/content_scrolling" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:alpha="0.5"
-        app:backgroundTint="#f5a000"
-        app:layout_anchor="@+id/include"
-        app:layout_anchorGravity="bottom|left"
-        app:srcCompat="@drawable/ic_send_black_24dp" />
-
 </android.support.design.widget.CoordinatorLayout>

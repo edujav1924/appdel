@@ -43,7 +43,6 @@ class customadapterspinner extends BaseAdapter {
         return 0;
     }
 
-    @SuppressLint("ViewHolder")
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         view = inflter.inflate(R.layout.custom_spinner_items, null);
@@ -71,6 +70,7 @@ class customadapterlist extends BaseAdapter {
     }
 
 
+
     @Override
     public int getCount() {
         return pedido.length;
@@ -86,7 +86,6 @@ class customadapterlist extends BaseAdapter {
         return 0;
     }
 
-    @SuppressLint("ViewHolder")
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         view = inflter.inflate(R.layout.custom_list_items, null);
@@ -96,8 +95,8 @@ class customadapterlist extends BaseAdapter {
         names.setText(pedido[i]);
         subtitlulo.setText(String.valueOf(precio[i])+" Gs.");
         cantidad_text.setText(String.valueOf(cantidad[i]));
-
         return view;
     }
+
 }
 

@@ -1,8 +1,6 @@
 package com.example.edu.delivery;
 
-import android.annotation.SuppressLint;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -10,7 +8,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,43 +19,32 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.shawnlin.numberpicker.NumberPicker;
-
+import com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker;
 import java.util.ArrayList;
 
-import static android.widget.Toast.LENGTH_LONG;
 
 public class ScrollingActivity extends AppCompatActivity {
     ImageView logo;
-    NumberPicker numberPicker;
+    ScrollableNumberPicker numberPicker;
     ListView pedidos_seleccionados;
     TextView total_text;
     Spinner categoria;
-    ArrayList<String> pedido_list = new ArrayList<String>();
-    ArrayList<Integer> precio_list = new ArrayList<Integer>();
+    ArrayList<String> pedido_list = new ArrayList<>();
+    ArrayList<Integer> precio_list = new ArrayList<>();
     ArrayList<Integer> cant_list = new ArrayList<>();
-    ArrayList<String> pedido_list_spinner = new ArrayList<String>();
-    ArrayList<String> precio_list_spinner = new ArrayList<String>();
+    ArrayList<String> pedido_list_spinner = new ArrayList<>();
+    ArrayList<String> precio_list_spinner = new ArrayList<>();
     private int id_seleccion;
+    customadapterlist madapter;
 
 
-    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         categoria = findViewById(R.id.categoria);
         pedidos_seleccionados = findViewById(R.id.lista);
         total_text = findViewById(R.id.total);
@@ -66,6 +52,14 @@ public class ScrollingActivity extends AppCompatActivity {
         toolbars();
         spinners();
         numberpickers();
+
+    }
+    public void total(){
+        int total=0;
+        for (int i=0;i<pedido_list.size();i++){
+            total = total + precio_list.get(i);
+        }
+        total_text.setText((String.valueOf(total)+" Gs."));
 
     }
     public void btn_agregar(View view){
@@ -89,44 +83,40 @@ public class ScrollingActivity extends AppCompatActivity {
                 Log.e("yaexst", String.valueOf(precio_list));
                 Log.e("yaexste", String.valueOf(cant_list));
             }
+            Log.e("pedido_list", String.valueOf(pedido_list));
             numberPicker.setValue(numberPicker.getMinValue());
             listviews();
             Utility.setListViewHeightBasedOnChildren(pedidos_seleccionados);
-            int total=0;
-            for (int i=0;i<pedido_list.size();i++){
-                total = total + precio_list.get(i);
-            }
-            total_text.setText((String.valueOf(total)+" Gs."));
-            Snackbar.make(view, "Agregado", Snackbar.LENGTH_SHORT)
-                    .setAction("Action", null).show();
+            total();
+
 
         }
 
     }
     private void spinners() {
-        String[] countryNames = {"Seleccione", "Hamburguesa normal", "Hamburguesa completa", "coca cola","lomito","papas fritas","cerveza","empanada"};
-        String[] subs = {"-----", "7000", "10000", "5000","15000","5000","8000","2000"};
-        for (int i=0;i<countryNames.length;i++){
+        String[] countryNames = {"Seleccione", "Hamburguesa normal", "Hamburguesa completa", "coca cola", "lomito", "papas fritas", "cerveza", "empanada"};
+        String[] subs = {"-----", "7000", "10000", "5000", "15000", "5000", "8000", "2000"};
+        for (int i = 0; i < countryNames.length; i++) {
             pedido_list_spinner.add(countryNames[i]);
             precio_list_spinner.add(subs[i]);
         }
-        customadapterspinner adaptador = new customadapterspinner(this,pedido_list_spinner,precio_list_spinner);
+        customadapterspinner adaptador = new customadapterspinner(this, pedido_list_spinner, precio_list_spinner);
         categoria.setAdapter(adaptador);
         categoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                id_seleccion= adapterView.getSelectedItemPosition();
+                id_seleccion = adapterView.getSelectedItemPosition();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
+
         });
     }
     private void toolbars(){
         final CollapsingToolbarLayout collapsingToolbarLayout =  findViewById(R.id.toolbar_layout);
-        final Toolbar tool = findViewById(R.id.toolbar);
         AppBarLayout appBarLayout =  findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = true;
@@ -154,9 +144,15 @@ public class ScrollingActivity extends AppCompatActivity {
 
     }
     private void listviews(){
-        customadapterlist madapter = new customadapterlist(this,pedido_list,precio_list,cant_list);
+        madapter = new customadapterlist(this,pedido_list,precio_list,cant_list);
         pedidos_seleccionados.setAdapter(madapter);
+        pedidos_seleccionados.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                showAlert(i);
 
+            }
+        });
     }
     private void numberpickers(){
         numberPicker = findViewById(R.id.number);
@@ -184,7 +180,7 @@ public class ScrollingActivity extends AppCompatActivity {
     }
 
     public static class Utility {
-        public static void setListViewHeightBasedOnChildren(ListView listView) {
+        static void setListViewHeightBasedOnChildren(ListView listView) {
             ListAdapter listAdapter = listView.getAdapter();
             if (listAdapter == null) {
                 // pre-condition
@@ -204,6 +200,33 @@ public class ScrollingActivity extends AppCompatActivity {
             listView.setLayoutParams(params);
             listView.requestLayout();
         }
+    }
+    private void showAlert(final int id) {
+        Log.e("id", String.valueOf(id));
+        final android.support.v7.app.AlertDialog.Builder dialog = new android.support.v7.app.AlertDialog.Builder(this);
+        dialog.setTitle("Pedido")
+                .setMessage("Desea quitar '"+cant_list.get(id)+" "+pedido_list.get(id)+"'s de la lista de pedidos?")
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                        pedido_list.remove(id);
+                        precio_list.remove(id);
+                        cant_list.remove(id);
+                        total();
+                        listviews();
+                        Utility.setListViewHeightBasedOnChildren(pedidos_seleccionados);
+
+
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+
+                    }
+                });
+        dialog.show();
+
     }
 
 }
