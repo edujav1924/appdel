@@ -12,33 +12,32 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.github.florent37.expansionpanel.viewgroup.ExpansionLayoutCollection;
 import com.github.florent37.expansionpanel.ExpansionLayout;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class BusquedaActivity extends AppCompatActivity{
         RecyclerView recyclerView;
+        ArrayList<String> filter_producto= new ArrayList<>();
+        ArrayList<Integer> filter_precio= new ArrayList<>();
         ArrayList<String> pais= new ArrayList<String>();
         ArrayList<Integer> precio = new ArrayList<>();
-
+        MaterialSearchView searchView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_busqueda);
         Toolbar toolbar2 = findViewById(R.id.toolbar2);
-        TextView mTitle =  toolbar2.findViewById(R.id.toolbar_title);
         toolbar2.setNavigationIcon(R.drawable.ic_menu);
         setSupportActionBar(toolbar2);
-        mTitle.setText(toolbar2.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         recyclerView = findViewById(R.id.customrecicler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         final RecyclerAdapter adapter = new RecyclerAdapter();
@@ -49,16 +48,64 @@ public class BusquedaActivity extends AppCompatActivity{
            pais.add(countryNames[i]);
            precio.add(Integer.valueOf(subs[i]));
         }
-        //fill with empty objects
-
         adapter.setItems(pais);
+        adapter.notifyDataSetChanged();
+        searchView = findViewById(R.id.search_view);
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                hasSubstring(pais,newText);
+                adapter.notifyDataSetChanged();
+                adapter.setItems(filter_producto);
+                return false;
+            }
+        });
+
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
+            }
+        });
+
     }
 
+   public boolean hasSubstring(Collection<String> c, String substring) {
+        filter_producto.clear();
+        filter_precio.clear();
+        int i=0;
+        for(String s : c) {
+            if(s.toLowerCase().contains(substring.toLowerCase())) {
+                Log.e("cascs", String.valueOf(i));
+                filter_producto.add(pais.get(i));
+                filter_precio.add(precio.get(i));
 
+            }
+            i=i+1;
+        }
+       Log.e("fg", String.valueOf(filter_precio));
+       Log.e("fg", String.valueOf(filter_producto));
+        return false;
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.mymenu, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        searchView.setMenuItem(item);
+
         return true;
     }
 
@@ -74,56 +121,6 @@ public class BusquedaActivity extends AppCompatActivity{
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-}
-class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerHolder> {
-    private final List<String> list = new ArrayList<>();
-    private static final int LAYOUT = R.layout.reciclercell;
-
-    private final ExpansionLayoutCollection expansionsCollection = new ExpansionLayoutCollection();
-
-    public void setItems(List<String> producto) {
-        this.list.addAll(producto);
-        notifyDataSetChanged();
-    }
-    public RecyclerAdapter() {
-        expansionsCollection.openOnlyOne(false);
-    }
-    @Override
-    public RecyclerAdapter.RecyclerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View mView = LayoutInflater.from(parent.getContext()).inflate(LAYOUT, parent, false);
-        return new RecyclerHolder(mView);
-    }
-
-    @Override
-    public void onBindViewHolder(RecyclerAdapter.RecyclerHolder holder, int position) {
-        TextView text = holder.itemView.findViewById(R.id.hola);
-        text.setText(list.get(position));
-        expansionsCollection.add(holder.getExpansionLayout());
-    }
-
-    @Override
-    public int getItemCount() {
-        return list.size();
-    }
-
-    public class RecyclerHolder extends RecyclerView.ViewHolder  {
-        ExpansionLayout expansionLayout;
-        public RecyclerHolder(View itemView) {
-            super(itemView);
-            expansionLayout = itemView.findViewById(R.id.expansionLayout);
-            expansionLayout.addListener(new ExpansionLayout.Listener() {
-                @Override
-                public void onExpansionChanged(ExpansionLayout expansionLayout, boolean expanded) {
-                    Log.e("ssfd", String.valueOf(getAdapterPosition()));
-                }
-            });
-        }
-        public ExpansionLayout getExpansionLayout() {
-            return expansionLayout;
-        }
-
     }
 
 }
