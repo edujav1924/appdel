@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.github.florent37.expansionpanel.viewgroup.ExpansionLayoutCollection;
@@ -50,7 +51,7 @@ public class BusquedaActivity extends AppCompatActivity{
         }
         //fill with empty objects
 
-        adapter.setItems(pais,precio);
+        adapter.setItems(pais);
     }
 
 
@@ -77,30 +78,27 @@ public class BusquedaActivity extends AppCompatActivity{
 
 }
 class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerHolder> {
-
     private final List<String> list = new ArrayList<>();
-    private final ArrayList<Integer> precio = new ArrayList<Integer>();
+    private static final int LAYOUT = R.layout.reciclercell;
+    CustomItemClickListener listener;
+
     private final ExpansionLayoutCollection expansionsCollection = new ExpansionLayoutCollection();
 
-    public RecyclerAdapter() {
-        expansionsCollection.openOnlyOne(false);
+    public void setItems(List<String> producto) {
+        this.list.addAll(producto);
+        notifyDataSetChanged();
+    }
+    @Override
+    public RecyclerAdapter.RecyclerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View mView = LayoutInflater.from(parent.getContext()).inflate(LAYOUT, parent, false);
+        return new RecyclerHolder(mView);
     }
 
     @Override
-    public RecyclerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return RecyclerHolder.buildFor(parent);
-
-    }
-
-    @Override
-    public void onBindViewHolder(RecyclerHolder holder, int position) {
-        holder.bind((list.get(position)));
-        TextView v= holder.itemView.findViewById(R.id.hola);
-        v.setText(list.get(position));
-        TextView price = holder.itemView.findViewById(R.id.price);
-        price.setText(String.valueOf(precio.get(position)));
+    public void onBindViewHolder(RecyclerAdapter.RecyclerHolder holder, int position) {
+        TextView text = holder.itemView.findViewById(R.id.hola);
+        text.setText(list.get(position));
         expansionsCollection.add(holder.getExpansionLayout());
-        
     }
 
     @Override
@@ -108,43 +106,16 @@ class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerHolde
         return list.size();
     }
 
-    public void setItems(ArrayList<String> items, ArrayList<Integer> precio) {
-        this.list.addAll(items);
-        this.precio.addAll(precio);
-        notifyDataSetChanged();
-    }
-
-    public final static class RecyclerHolder extends RecyclerView.ViewHolder  implements View.OnClickListener  {
-        private static final int LAYOUT = R.layout.reciclercell;
-
-
-        @BindView(R.id.expansionLayout)
+    public class RecyclerHolder extends RecyclerView.ViewHolder  {
         ExpansionLayout expansionLayout;
-
-        public static RecyclerHolder buildFor(ViewGroup viewGroup){
-            return new RecyclerHolder(LayoutInflater.from(viewGroup.getContext()).inflate(LAYOUT, viewGroup, false));
-        }
-
         public RecyclerHolder(View itemView) {
             super(itemView);
-            itemView.setOnClickListener(this);
-            ButterKnife.bind(this, itemView);
+            expansionLayout = itemView.findViewById(R.id.expansionLayout);
         }
-
-        public void bind(String i){
-            expansionLayout.collapse(false);
-        }
-
         public ExpansionLayout getExpansionLayout() {
             return expansionLayout;
         }
 
-
-        @Override
-        public void onClick(View view) {
-
-        }
     }
+
 }
-
-
