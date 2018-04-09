@@ -80,13 +80,15 @@ public class BusquedaActivity extends AppCompatActivity{
 class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerHolder> {
     private final List<String> list = new ArrayList<>();
     private static final int LAYOUT = R.layout.reciclercell;
-    CustomItemClickListener listener;
 
     private final ExpansionLayoutCollection expansionsCollection = new ExpansionLayoutCollection();
 
     public void setItems(List<String> producto) {
         this.list.addAll(producto);
         notifyDataSetChanged();
+    }
+    public RecyclerAdapter() {
+        expansionsCollection.openOnlyOne(false);
     }
     @Override
     public RecyclerAdapter.RecyclerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -111,6 +113,12 @@ class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerHolde
         public RecyclerHolder(View itemView) {
             super(itemView);
             expansionLayout = itemView.findViewById(R.id.expansionLayout);
+            expansionLayout.addListener(new ExpansionLayout.Listener() {
+                @Override
+                public void onExpansionChanged(ExpansionLayout expansionLayout, boolean expanded) {
+                    Log.e("ssfd", String.valueOf(getAdapterPosition()));
+                }
+            });
         }
         public ExpansionLayout getExpansionLayout() {
             return expansionLayout;
