@@ -27,5 +27,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'
     compile 'com.shawnlin:number-picker:2.4.6'
     compile 'com.michaelmuenzer.android:ScrollableNumberPicker:0.2.2'
+    compile 'com.github.florent37:expansionpanel:1.1.1'
+    compile 'com.android.support:cardview-v7:21.0.+'
+    compile 'com.android.support:recyclerview-v7:21.0.+'
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 }
