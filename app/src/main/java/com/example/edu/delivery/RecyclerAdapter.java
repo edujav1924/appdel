@@ -16,7 +16,7 @@ import java.util.List;
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerHolder> {
     private final List<String> list = new ArrayList<>();
     private static final int LAYOUT = R.layout.reciclercell;
-
+    private String textos = "";
     private final ExpansionLayoutCollection expansionsCollection = new ExpansionLayoutCollection();
 
     public void setItems(List<String> producto) {
@@ -25,7 +25,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
 
     }
     public RecyclerAdapter() {
+
         expansionsCollection.openOnlyOne(false);
+
     }
     @Override
     public RecyclerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -35,8 +37,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
 
     @Override
     public void onBindViewHolder(RecyclerHolder holder, int position) {
+        for (int i=0;i<list.size();i++){
+            textos = textos + "\uD83C\uDF73 \uD83C\uDF78"+list.get(i)+"\n";
+            Log.e("fdfd",textos);
+        }
         TextView text = holder.itemView.findViewById(R.id.hola);
         text.setText(list.get(position));
+        TextView content = holder.itemView.findViewById(R.id.content);
+        content.setText(textos);
+        textos = "";
         expansionsCollection.add(holder.getExpansionLayout());
     }
 

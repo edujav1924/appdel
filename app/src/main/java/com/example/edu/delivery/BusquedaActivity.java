@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.florent37.expansionpanel.viewgroup.ExpansionLayoutCollection;
@@ -23,12 +24,15 @@ import java.util.Collection;
 import java.util.List;
 
 public class BusquedaActivity extends AppCompatActivity{
-        RecyclerView recyclerView;
-        ArrayList<String> filter_producto= new ArrayList<>();
-        ArrayList<Integer> filter_precio= new ArrayList<>();
-        ArrayList<String> pais= new ArrayList<String>();
-        ArrayList<Integer> precio = new ArrayList<>();
-        MaterialSearchView searchView;
+    RecyclerView recyclerView;
+    ArrayList<String> filter_producto= new ArrayList<>();
+    ArrayList<Integer> filter_precio= new ArrayList<>();
+    ArrayList<String> pais= new ArrayList<String>();
+    ArrayList<Integer> precio = new ArrayList<>();
+    MaterialSearchView searchView;
+    TextView result_text;
+    ListView busqueda;
+    customadapterbusqueda adapter3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +41,8 @@ public class BusquedaActivity extends AppCompatActivity{
         toolbar2.setNavigationIcon(R.drawable.ic_menu);
         setSupportActionBar(toolbar2);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
+        result_text = findViewById(R.id.result_text);
+        result_text.setVisibility(View.GONE);
         recyclerView = findViewById(R.id.customrecicler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         final RecyclerAdapter adapter = new RecyclerAdapter();
@@ -56,7 +61,7 @@ public class BusquedaActivity extends AppCompatActivity{
             public boolean onQueryTextSubmit(String query) {
 
 
-                return false;
+                return true;
             }
 
             @Override
@@ -64,6 +69,13 @@ public class BusquedaActivity extends AppCompatActivity{
                 hasSubstring(pais,newText);
                 adapter.notifyDataSetChanged();
                 adapter.setItems(filter_producto);
+                if (filter_producto.isEmpty()){
+                    result_text.setText("No se encontraron resultados");
+                    result_text.setVisibility(View.VISIBLE);
+                }
+                else {
+                    result_text.setVisibility(View.GONE);
+                }
                 return false;
             }
         });
@@ -88,16 +100,22 @@ public class BusquedaActivity extends AppCompatActivity{
         int i=0;
         for(String s : c) {
             if(s.toLowerCase().contains(substring.toLowerCase())) {
-                Log.e("cascs", String.valueOf(i));
                 filter_producto.add(pais.get(i));
                 filter_precio.add(precio.get(i));
 
             }
             i=i+1;
         }
-       Log.e("fg", String.valueOf(filter_precio));
-       Log.e("fg", String.valueOf(filter_producto));
+
         return false;
+    }
+    @Override
+    public void onBackPressed() {
+        if (searchView.isSearchOpen()) {
+            searchView.closeSearch();
+        } else {
+            super.onBackPressed();
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

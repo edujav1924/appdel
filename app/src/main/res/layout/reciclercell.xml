@@ -20,12 +20,12 @@
             android:paddingRight="16dp">
 
             <TextView
-                android:id="@+id/price"
+                android:id="@+id/empresa"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="Trip name"
-                android:textColor="#3E3E3E" />
+                android:text="Empresa"
+                android:textColor="#ff0000" />
 
             <TextView
                 android:id="@+id/hola"
@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="120dp"
-                android:text="Carribean cruise"
+                android:text="localizacion"
                 android:textColor="#AAA" />
 
             <android.support.v7.widget.AppCompatImageView
@@ -58,17 +58,17 @@
 
         <LinearLayout
             android:id="@+id/container"
-            android:layout_height="wrap_content"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
-                android:background="#EEE"
-                android:gravity="center"
-                android:layout_height="100dp"
+                android:id="@+id/content"
                 android:layout_width="match_parent"
-                android:text="content" />
-
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textColor="@android:color/holo_blue_light"
+                android:textSize="18sp" />
         </LinearLayout>
 
     </com.github.florent37.expansionpanel.ExpansionLayout>

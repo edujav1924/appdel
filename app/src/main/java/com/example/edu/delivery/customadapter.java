@@ -97,6 +97,49 @@ class customadapterlist extends BaseAdapter {
         cantidad_text.setText(String.valueOf(cantidad[i]));
         return view;
     }
-
 }
 
+class customadapterbusqueda extends BaseAdapter {
+    Context context;
+    private String[] comida;
+    private Integer[] bebida;
+    LayoutInflater inflter;
+
+    public customadapterbusqueda(Context applicationContext, ArrayList<String> comida, ArrayList<Integer> bebida) {
+        this.context = applicationContext;
+        this.comida = comida.toArray(new String[0]);
+        this.bebida = bebida.toArray(new Integer[0]);
+        inflter = (LayoutInflater.from(applicationContext));
+    }
+    @Override
+    public int getCount() {
+        if (comida.length>bebida.length){
+            return comida.length;
+        }
+        else return bebida.length;
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int i) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        view = inflter.inflate(R.layout.customitemlist, null);
+        TextView comidaview = view.findViewById(R.id.busqueda_comida);
+        TextView bebidaview = view.findViewById(R.id.busqueda_bebida);
+        if (comida.length>=i) {
+            comidaview.setText(comida[i]);
+        }
+        if (bebida.length>=i){
+            bebidaview.setText(String.valueOf(bebida[i]));
+        }
+        return view;
+    }
+}
