@@ -56,20 +56,10 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent">
 
-        <LinearLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+        <include
+            layout="@layout/prueba">
 
-            <TextView
-                android:id="@+id/content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TextView"
-                android:textColor="@android:color/holo_blue_light"
-                android:textSize="18sp" />
-        </LinearLayout>
+        </include>
 
     </com.github.florent37.expansionpanel.ExpansionLayout>
 </LinearLayout>
