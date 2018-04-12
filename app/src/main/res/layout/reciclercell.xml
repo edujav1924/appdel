@@ -13,9 +13,9 @@
         app:expansion_toggleOnClick="true">
 
         <RelativeLayout
-            android:background="@android:color/white"
-            android:layout_height="48dp"
             android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/customborderright"
             android:paddingLeft="16dp"
             android:paddingRight="16dp">
 
@@ -32,19 +32,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="120dp"
+                android:layout_marginEnd="53dp"
+                android:layout_toStartOf="@+id/headerIndicator"
                 android:text="localizacion"
-                android:textColor="#AAA" />
+                android:textAlignment="viewStart"
+                android:textColor="@android:color/holo_red_dark" />
 
             <android.support.v7.widget.AppCompatImageView
-                android:adjustViewBounds="true"
                 android:id="@+id/headerIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:layout_width="wrap_content"
+                android:adjustViewBounds="true"
                 app:srcCompat="@drawable/ic_expansion_header_indicator_grey_24dp" />
+
+            <ImageView
+                android:id="@+id/imageView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:layout_toStartOf="@+id/headerIndicator"
+                app:srcCompat="@drawable/ic_location_on_black_24dp" />
 
         </RelativeLayout>
 

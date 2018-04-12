@@ -16,14 +16,16 @@ import java.util.List;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerHolder> {
     private final List<String> list = new ArrayList<>();
+    private final List<String> list2 = new ArrayList<>();
     private static final int LAYOUT = R.layout.reciclercell;
     private String textos,textos2 = "";
     private final ExpansionLayoutCollection expansionsCollection = new ExpansionLayoutCollection();
 
-    public void setItems(List<String> producto) {
+    public void setItems(List<String> distancias, List<String> producto) {
         this.list.clear();
+        this.list2.clear();
         this.list.addAll(producto);
-
+        this.list2.addAll(distancias);
     }
     public RecyclerAdapter() {
 
@@ -43,7 +45,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
             textos2 = textos2 + "  \uD83C\uDF79"+list.get(i)+"\n";
         }
         TextView text = holder.itemView.findViewById(R.id.hola);
+        TextView h = holder.itemView.findViewById(R.id.empresa);
         text.setText(list.get(position));
+        h.setText(list2.get(position));
         TextView content = holder.itemView.findViewById(R.id.content);
         content.setText(textos);
         TextView c = holder.itemView.findViewById(R.id.bebida);

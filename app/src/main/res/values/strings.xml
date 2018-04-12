@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Delivery</string>
     <string name="action_settings">Settings</string>
     <string name="Producto">Producto</string>
