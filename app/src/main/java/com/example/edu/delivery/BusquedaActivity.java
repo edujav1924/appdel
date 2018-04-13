@@ -40,6 +40,7 @@ public class BusquedaActivity extends AppCompatActivity{
     MaterialSearchView searchView;
     TextView result_text;
     WebView web;
+    RecyclerAdapter adapter;
     List<String> filter_distancias=new ArrayList<>();
     List<String> direcciones=new ArrayList<>();
     List<String> tiempo=new ArrayList<>();
@@ -53,66 +54,13 @@ public class BusquedaActivity extends AppCompatActivity{
         setSupportActionBar(toolbar2);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         result_text = findViewById(R.id.result_text);
-        //web = findViewById(R.id.web);
-        //web.getSettings().setJavaScriptEnabled(true);
-        //web.getSettings().setBuiltInZoomControls(false);
-        //web.loadUrl("https://www.google.com/maps/dir/-25.3189877,-57.5540246/-25.3418079,-57.5143931/@-25.3303479,-57.5405402,15z/data=!3m1!4b1");
         result_text.setVisibility(View.GONE);
         recyclerView = findViewById(R.id.customrecicler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        final RecyclerAdapter adapter = new RecyclerAdapter();
+        adapter = new RecyclerAdapter();
         recyclerView.setAdapter(adapter);
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://maps.googleapis.com/maps/api/distancematrix/json?units=meter&" +
-                "origins=-25.301285,-57.564635&destinations=-25.2638806,-57.5120576%7C" +
-                "-25.27008,-57.525027%7C-25.259486,-57.588522%7C-25.314263,-57.459704";
-        final ProgressDialog dialog = ProgressDialog.show(this, "Descargando datos del Servidor",
-                "Cargando", true);
-        dialog.show();
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsono = new JSONObject(response);
-                            JSONArray arrayLocales = jsono.getJSONArray("destination_addresses");
-                            for (int i=0;i<arrayLocales.length();i++){
-                                direcciones.add(arrayLocales.getString(i));
-                            }
-                            JSONArray milocation = jsono.getJSONArray("origin_addresses");
-                            JSONArray elements = jsono.getJSONArray("rows").getJSONObject(0).getJSONArray("elements");
-                            for (int i=0;i<elements.length();i++){
-                                JSONObject aux3 =elements.getJSONObject(i).getJSONObject("distance");
-                                distancias.add(aux3.getString("text"));
-                                aux3 = elements.getJSONObject(i).getJSONObject("duration");
-                                tiempo.add(aux3.getString("text"));
-                                //Log.e("get", aux3.getString("text"));
+        getdata();
 
-                            }
-                            dialog.dismiss();
-                            adapter.setItems(direcciones,distancias);
-                            adapter.notifyDataSetChanged();
-                            Log.e("get", String.valueOf(direcciones));
-                            Log.e("get", String.valueOf(distancias));
-                            Log.e("get", String.valueOf(tiempo));
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-                Toast.makeText(getApplicationContext(),
-                        "error del servidor",
-                        LENGTH_LONG).show();
-
-            }
-        });
-        queue.add(stringRequest);
         /*String[] countryNames = {"Seleccione", "Hamburguesa normal", "Hamburguesa completa", "coca cola", "lomito", "papas fritas", "cerveza", "empanada"};
         String[] subs = {"0", "7000", "10000", "5000", "15000", "5000", "8000", "2000"};
         for (int i = 0; i < di.length; i++) {
@@ -158,9 +106,100 @@ public class BusquedaActivity extends AppCompatActivity{
             }
         });
     }
-    public void reciclerviewshow(){
 
+    public void getdata() {
+        RequestQueue queue2 = Volley.newRequestQueue(this);
+        String url ="http://192.168.43.158:8000/empresa.json";
+        final ProgressDialog dialog2 = ProgressDialog.show(this, "Descargando datos",
+                "Cargando", true);
+        dialog2.show();
+        StringRequest stringRequest2 = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("data",response);
+                        dialog2.dismiss();
+                        try {
+                            JSONArray jsono = new JSONArray(response);
+                            for (int i=0;i<jsono.length();i++){
+                                Log.e("value", String.valueOf(jsono.getJSONObject(i).getJSONArray("productos")));
+                                for (int j=0;j<jsono.length();j++){
+                                    Log.e("value", String.valueOf(jsono.getJSONObject(i).getJSONArray("productos").getJSONObject(j).getString("producto")));
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.e("Error1","Error1");
+                            dialog2.dismiss();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                dialog2.dismiss();
+                Toast.makeText(getApplicationContext(),
+                        "error del servidor",
+                        LENGTH_LONG).show();
+
+            }
+        });
+        queue2.add(stringRequest2);
     }
+
+    /*public void getdirections() {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url ="http://192.168.43.158:8000/empresa.json";
+        final ProgressDialog dialog = ProgressDialog.show(this, "Descargando datos del Servidor",
+                "Cargando", true);
+        dialog.show();
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsono = new JSONObject(response);
+                            JSONArray arrayLocales = jsono.getJSONArray("destination_addresses");
+                            for (int i=0;i<arrayLocales.length();i++){
+                                direcciones.add(arrayLocales.getString(i));
+                            }
+                            JSONArray milocation = jsono.getJSONArray("origin_addresses");
+                            JSONArray elements = jsono.getJSONArray("rows").getJSONObject(0).getJSONArray("elements");
+                            for (int i=0;i<elements.length();i++){
+                                JSONObject aux3 =elements.getJSONObject(i).getJSONObject("distance");
+                                distancias.add(aux3.getString("text"));
+                                aux3 = elements.getJSONObject(i).getJSONObject("duration");
+                                tiempo.add(aux3.getString("text"));
+                                //Log.e("get", aux3.getString("text"));
+
+                            }
+                            dialog.dismiss();
+                            adapter.setItems(direcciones,distancias);
+                            adapter.notifyDataSetChanged();
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.e("Error1","Error1");
+                            dialog.dismiss();
+                        }
+
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Error2","Error2");
+
+                dialog.dismiss();
+                Toast.makeText(getApplicationContext(),
+                        "error del servidor",
+                        LENGTH_LONG).show();
+
+            }
+        });
+        queue.add(stringRequest);
+    }*/
+
     public boolean hasSubstring(Collection<String> c, String substring) {
     filter_empresa.clear();
     filter_distancias.clear();
