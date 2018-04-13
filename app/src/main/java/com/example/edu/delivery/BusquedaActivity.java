@@ -63,7 +63,9 @@ public class BusquedaActivity extends AppCompatActivity{
         final RecyclerAdapter adapter = new RecyclerAdapter();
         recyclerView.setAdapter(adapter);
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://maps.googleapis.com/maps/api/distancematrix/json?units=meter&origins=-25.301285,-57.564635&destinations=-25.2638806,-57.5120576%7C-25.27008,-57.525027%7C-25.259486,-57.588522%7C-25.314263,-57.459704";
+        String url ="http://maps.googleapis.com/maps/api/distancematrix/json?units=meter&" +
+                "origins=-25.301285,-57.564635&destinations=-25.2638806,-57.5120576%7C" +
+                "-25.27008,-57.525027%7C-25.259486,-57.588522%7C-25.314263,-57.459704";
         final ProgressDialog dialog = ProgressDialog.show(this, "Descargando datos del Servidor",
                 "Cargando", true);
         dialog.show();
@@ -78,14 +80,11 @@ public class BusquedaActivity extends AppCompatActivity{
                                 direcciones.add(arrayLocales.getString(i));
                             }
                             JSONArray milocation = jsono.getJSONArray("origin_addresses");
-                            JSONArray rows = jsono.getJSONArray("rows");
-                            JSONObject aux1 = rows.getJSONObject(0);
-                            JSONArray elements = aux1.getJSONArray("elements");
+                            JSONArray elements = jsono.getJSONArray("rows").getJSONObject(0).getJSONArray("elements");
                             for (int i=0;i<elements.length();i++){
-                                JSONObject a = elements.getJSONObject(i);
-                                JSONObject aux3 = a.getJSONObject("distance");
+                                JSONObject aux3 =elements.getJSONObject(i).getJSONObject("distance");
                                 distancias.add(aux3.getString("text"));
-                                aux3 = a.getJSONObject("duration");
+                                aux3 = elements.getJSONObject(i).getJSONObject("duration");
                                 tiempo.add(aux3.getString("text"));
                                 //Log.e("get", aux3.getString("text"));
 
@@ -168,7 +167,7 @@ public class BusquedaActivity extends AppCompatActivity{
     int i=0;
     for(String s : c) {
         if(s.toLowerCase().contains(substring.toLowerCase())) {
-            filter_empresa.add(direcciones.get(i));
+            filter_empresa.add(direcciones.get(i).substring(0,17));
             filter_distancias.add(distancias.get(i));
         }
         i=i+1;

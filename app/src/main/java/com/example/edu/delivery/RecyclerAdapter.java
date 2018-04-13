@@ -46,8 +46,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
         }
         TextView text = holder.itemView.findViewById(R.id.hola);
         TextView h = holder.itemView.findViewById(R.id.empresa);
+        //Log.e("sd",list2.get(position).substring(0,20));
         text.setText(list.get(position));
-        h.setText(list2.get(position));
+        h.setText(list2.get(position).substring(0,17));
         TextView content = holder.itemView.findViewById(R.id.content);
         content.setText(textos);
         TextView c = holder.itemView.findViewById(R.id.bebida);
