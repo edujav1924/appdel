@@ -27,16 +27,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static android.widget.Toast.LENGTH_LONG;
 
 public class BusquedaActivity extends AppCompatActivity{
+    JSONArray jsono;
     RecyclerView recyclerView;
-    ArrayList<String> filter_empresa= new ArrayList<>();
-    ArrayList<String> producto= new ArrayList<>();
-    ArrayList<Integer> precio = new ArrayList<>();
+    ArrayList<String> latitud= new ArrayList<>();
+    ArrayList<String> longitud = new ArrayList<String>();
     MaterialSearchView searchView;
     TextView result_text;
     WebView web;
@@ -80,10 +79,7 @@ public class BusquedaActivity extends AppCompatActivity{
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                hasSubstring(direcciones,newText);
-                adapter.notifyDataSetChanged();
-                adapter.setItems(filter_empresa,filter_distancias);
-                if (filter_empresa.isEmpty()){
+                if (hasSubstring(jsono,newText)){
                     result_text.setText("No se encontraron resultados");
                     result_text.setVisibility(View.VISIBLE);
                 }
@@ -117,16 +113,21 @@ public class BusquedaActivity extends AppCompatActivity{
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("data",response);
                         dialog2.dismiss();
                         try {
-                            JSONArray jsono = new JSONArray(response);
+                            jsono = new JSONArray(response);
+
                             for (int i=0;i<jsono.length();i++){
+                                latitud.add(jsono.getJSONObject(i).getString("latitud"));
+                                longitud.add(jsono.getJSONObject(i).getString("longitud"));
+                            }
+                            getdirections(jsono);
+                            /*for (int i=0;i<jsono.length();i++){
                                 Log.e("value", String.valueOf(jsono.getJSONObject(i).getJSONArray("productos")));
                                 for (int j=0;j<jsono.length();j++){
                                     Log.e("value", String.valueOf(jsono.getJSONObject(i).getJSONArray("productos").getJSONObject(j).getString("producto")));
                                 }
-                            }
+                            }*/
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Log.e("Error1","Error1");
@@ -140,15 +141,18 @@ public class BusquedaActivity extends AppCompatActivity{
                 Toast.makeText(getApplicationContext(),
                         "error del servidor",
                         LENGTH_LONG).show();
-
             }
         });
         queue2.add(stringRequest2);
     }
-
-    /*public void getdirections() {
+    public void getdirections(final JSONArray other) {
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://192.168.43.158:8000/empresa.json";
+        String url = "http://maps.googleapis.com/maps/api/distancematrix/json?units=meter&origins=-25.267376,-57.492435&destinations=";
+        for (int j=0;j<latitud.size();j++){
+            url = url + latitud.get(j) +"%2C"+longitud.get(j)+"%7C";
+        }
+        Log.e("url",url);
+        //String url ="http://maps.googleapis.com/maps/api/distancematrix/json?units=meter&origins=40.6655101,-73.89188969999998&destinations=40.6905615%2C-73.9976592";
         final ProgressDialog dialog = ProgressDialog.show(this, "Descargando datos del Servidor",
                 "Cargando", true);
         dialog.show();
@@ -172,9 +176,9 @@ public class BusquedaActivity extends AppCompatActivity{
                                 //Log.e("get", aux3.getString("text"));
 
                             }
+                            adapter.setItems(other,distancias);
                             dialog.dismiss();
-                            adapter.setItems(direcciones,distancias);
-                            adapter.notifyDataSetChanged();
+                            Log.e("resultado", String.valueOf(distancias));
 
 
                         } catch (JSONException e) {
@@ -198,21 +202,27 @@ public class BusquedaActivity extends AppCompatActivity{
             }
         });
         queue.add(stringRequest);
-    }*/
-
-    public boolean hasSubstring(Collection<String> c, String substring) {
-    filter_empresa.clear();
-    filter_distancias.clear();
-    int i=0;
-    for(String s : c) {
-        if(s.toLowerCase().contains(substring.toLowerCase())) {
-            filter_empresa.add(direcciones.get(i).substring(0,17));
-            filter_distancias.add(distancias.get(i));
-        }
-        i=i+1;
     }
 
-    return false;
+    public boolean hasSubstring(JSONArray c, String substring) {
+        JSONArray customjson = new JSONArray();
+        for (int i=0;i<c.length();i++){
+            try {
+                if( c.getJSONObject(i).getString("empresa").toLowerCase().contains(substring.toLowerCase())) {
+                    customjson.put(c.getJSONObject(i));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.e("isempty", String.valueOf(customjson.length()));
+        adapter.setItems(customjson, distancias);
+        adapter.notifyDataSetChanged();
+        if(customjson.length()>0){
+            return false;
+        }else {
+            return true;
+        }
     }
     @Override
     public void onBackPressed() {
