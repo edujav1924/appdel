@@ -149,7 +149,7 @@ public class BusquedaActivity extends AppCompatActivity{
         RequestQueue queue = Volley.newRequestQueue(this);
         String url = "http://maps.googleapis.com/maps/api/distancematrix/json?units=meter&origins=-25.267376,-57.492435&destinations=";
         for (int j=0;j<latitud.size();j++){
-            url = url + latitud.get(j) +"%2C"+longitud.get(j)+"%7C";
+            url = url + longitud.get(j) +"%2C"+latitud.get(j)+"%7C";
         }
         Log.e("url",url);
         //String url ="http://maps.googleapis.com/maps/api/distancematrix/json?units=meter&origins=40.6655101,-73.89188969999998&destinations=40.6905615%2C-73.9976592";
@@ -177,8 +177,8 @@ public class BusquedaActivity extends AppCompatActivity{
 
                             }
                             adapter.setItems(other,distancias);
+                            adapter.notifyDataSetChanged();
                             dialog.dismiss();
-                            Log.e("resultado", String.valueOf(distancias));
 
 
                         } catch (JSONException e) {
@@ -215,7 +215,6 @@ public class BusquedaActivity extends AppCompatActivity{
                 e.printStackTrace();
             }
         }
-        Log.e("isempty", String.valueOf(customjson.length()));
         adapter.setItems(customjson, distancias);
         adapter.notifyDataSetChanged();
         if(customjson.length()>0){
