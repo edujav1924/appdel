@@ -1,5 +1,8 @@
 package com.example.edu.delivery;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,14 +27,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     private final ExpansionLayoutCollection expansionsCollection = new ExpansionLayoutCollection();
     private JSONArray jsonarray = new JSONArray();
     private List<String> distancias=new ArrayList<>();
+    private Context context;
+
     public void setItems(JSONArray jsono, List<String> distancias) {
         this.jsonarray = jsono;
         this.distancias.clear();
         this.distancias.addAll(distancias);
-        Log.e("sds", String.valueOf(this.distancias));
     }
-    public RecyclerAdapter() {
-
+    public RecyclerAdapter(BusquedaActivity busquedaActivity) {
+        this.context = busquedaActivity;
         expansionsCollection.openOnlyOne(false);
 
     }
@@ -105,6 +109,20 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
                 @Override
                 public void onClick(View view) {
                     Log.e("ir a", String.valueOf(getAdapterPosition()));
+                    Intent intent = new Intent(context,ScrollingActivity.class);
+                    intent.putExtra("objeto", String.valueOf(jsonarray));
+                    intent.putExtra("posicion", String.valueOf(getAdapterPosition()));
+                    context.startActivity(intent);
+
+                }
+            });
+            Button btnmap = itemView.findViewById(R.id.mapa);
+            btnmap.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Uri uri = Uri.parse("https://www.google.com/maps/dir/-25.2669752,-57.505732/-25.265015,-57.512561/@-25.2663761,-57.513863,16z/data=!3m1!4b1");
+                    Intent newintent = new Intent(Intent.ACTION_VIEW,uri);
+                    context.startActivity(newintent);
                 }
             });
         }

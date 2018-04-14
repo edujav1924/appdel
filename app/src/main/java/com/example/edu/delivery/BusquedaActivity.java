@@ -1,6 +1,9 @@
 package com.example.edu.delivery;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.drm.DrmStore;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -56,7 +59,7 @@ public class BusquedaActivity extends AppCompatActivity{
         result_text.setVisibility(View.GONE);
         recyclerView = findViewById(R.id.customrecicler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RecyclerAdapter();
+        adapter = new RecyclerAdapter(this);
         recyclerView.setAdapter(adapter);
         getdata();
 
@@ -237,7 +240,17 @@ public class BusquedaActivity extends AppCompatActivity{
     getMenuInflater().inflate(R.menu.mymenu, menu);
     MenuItem item = menu.findItem(R.id.action_search);
     searchView.setMenuItem(item);
-
+    MenuItem loc = menu.findItem(R.id.location);
+    loc.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem) {
+            Log.e("sd","pulsado");
+            Uri uri = Uri.parse("https://www.google.com/maps/d/viewer?mid=136OvfGkpWnvZP6G1uDAmw_AWx-1JNHqJ&ll=-25.28863824629068%2C-57.51148585000004&z=15");
+            Intent newintent = new Intent(getIntent().ACTION_VIEW,uri);
+            startActivity(newintent);
+            return false;
+        }
+    });
     return true;
     }
 

@@ -34,7 +34,7 @@
                         android:id="@+id/toolbar2"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
-                        android:background="@color/colorPrimaryDark" />
+                        android:background="@color/colorPrimary" />
 
                     <com.miguelcatalan.materialsearchview.MaterialSearchView
                         android:id="@+id/search_view"
@@ -63,9 +63,8 @@
                         android:id="@+id/result_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true"
                         android:layout_centerHorizontal="true"
-                        android:layout_marginTop="12dp"
+                        android:layout_centerVertical="true"
                         android:text="TextView" />
 
                 </RelativeLayout>
@@ -73,19 +72,6 @@
 
             </RelativeLayout>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="400dp">
-
-                <com.google.android.gms.maps.MapView
-                    android:id="@+id/mapView"
-                    android:layout_width="344dp"
-                    android:layout_height="384dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    tools:layout_editor_absoluteX="8dp"
-                    tools:layout_editor_absoluteY="336dp" />
-            </RelativeLayout>
         </LinearLayout>
 
     </ScrollView>

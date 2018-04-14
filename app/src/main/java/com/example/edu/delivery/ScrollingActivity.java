@@ -1,6 +1,7 @@
 package com.example.edu.delivery;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -19,6 +20,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
 
 
@@ -50,6 +55,9 @@ public class ScrollingActivity extends AppCompatActivity {
         toolbars();
         spinners();
         numberpickers();
+        Log.e("fg",getIntent().getExtras().getString("objeto"));
+        Log.e("fg",getIntent().getExtras().getString("posicion"));
+
 
     }
     public void total(){
@@ -62,6 +70,8 @@ public class ScrollingActivity extends AppCompatActivity {
     }
     public void btn_agregar(View view){
         int canti = numberPicker.getValue();
+        Log.e("canti", String.valueOf(canti));
+        Log.e("canti", String.valueOf(id_seleccion));
         if (id_seleccion!=0 && canti!=0) {
 
             Integer precio = Integer.parseInt(precio_list_spinner.get(id_seleccion));
@@ -73,15 +83,11 @@ public class ScrollingActivity extends AppCompatActivity {
 
             }
             else {
-                Log.e("yaexste","fbg");
                 int id = pedido_list.indexOf(producto);
                 precio_list.set(id,precio*canti);
                 cant_list.set(id,canti);
-                Log.e("id",String.valueOf(id));
-                Log.e("yaexst", String.valueOf(precio_list));
-                Log.e("yaexste", String.valueOf(cant_list));
+
             }
-            Log.e("pedido_list", String.valueOf(pedido_list));
             numberPicker.setValue(numberPicker.getMinValue());
             listviews();
             Utility.setListViewHeightBasedOnChildren(pedidos_seleccionados);
@@ -92,11 +98,18 @@ public class ScrollingActivity extends AppCompatActivity {
 
     }
     private void spinners() {
-        String[] countryNames = {"Seleccione", "Hamburguesa normal", "Hamburguesa completa", "coca cola", "lomito", "papas fritas", "cerveza", "empanada"};
-        String[] subs = {"-----", "7000", "10000", "5000", "15000", "5000", "8000", "2000"};
-        for (int i = 0; i < countryNames.length; i++) {
-            pedido_list_spinner.add(countryNames[i]);
-            precio_list_spinner.add(subs[i]);
+
+        int position = Integer.parseInt(getIntent().getExtras().getString("posicion"));
+        try {
+            pedido_list_spinner.add("--Seleccione--");
+            precio_list_spinner.add("----");
+            JSONArray objeto = new JSONArray(getIntent().getExtras().getString("objeto"));
+            for (int i =0;i<objeto.getJSONObject(position).getJSONArray("productos").length();i++){
+                pedido_list_spinner.add(objeto.getJSONObject(position).getJSONArray("productos").getJSONObject(i).getString("producto"));
+                precio_list_spinner.add(objeto.getJSONObject(position).getJSONArray("productos").getJSONObject(i).getString("precio"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
         customadapterspinner adaptador = new customadapterspinner(this, pedido_list_spinner, precio_list_spinner);
         categoria.setAdapter(adaptador);
@@ -148,7 +161,6 @@ public class ScrollingActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 showAlert(i);
-
             }
         });
     }
@@ -200,7 +212,6 @@ public class ScrollingActivity extends AppCompatActivity {
         }
     }
     private void showAlert(final int id) {
-        Log.e("id", String.valueOf(id));
         final android.support.v7.app.AlertDialog.Builder dialog = new android.support.v7.app.AlertDialog.Builder(this);
         dialog.setTitle("Pedido")
                 .setMessage("Desea quitar '"+cant_list.get(id)+" "+pedido_list.get(id)+"'s de la lista de pedidos?")
