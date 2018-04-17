@@ -1,5 +1,7 @@
 package com.example.edu.delivery;
 
+import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import  com.tuyenmonkey.mkloader.*;
@@ -71,7 +74,7 @@ public class inti extends AppCompatActivity {
         queue2.add(stringRequest2);
     }
 
-    private void getdirections(JSONArray jsono, List<String> latitud, List<String> longitud) {
+    private void getdirections(final JSONArray jsono, List<String> latitud, List<String> longitud) {
         texto_init.setText("obteniendo localizacion...");
 
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -103,9 +106,9 @@ public class inti extends AppCompatActivity {
                                 tiempo.add(aux3.getString("text"));
                                 //Log.e("get", aux3.getString("text"));
                                 findViewById(R.id.MKLoader).setVisibility(View.GONE);
-                                texto_init.setText("Finalizado");
-
                             }
+                            texto_init.setText("Finalizado");
+                            desarrollo(direcciones,distancias,tiempo,jsono);
                         } catch (JSONException e) {
                             e.printStackTrace();
                             texto_init.setText("Hubo un error al recibir datos de localizacion");
@@ -118,6 +121,17 @@ public class inti extends AppCompatActivity {
             }
         });
         queue.add(stringRequest);
+    }
+
+    private void desarrollo(List<String> direcciones, List<String> distancias, List<String> tiempo, JSONArray jsono) {
+        Intent intent = new Intent(this, BusquedaActivity.class);
+        intent.putExtra("direcciones", (Serializable) direcciones);
+        intent.putExtra("distancias", (Serializable) distancias);
+        intent.putExtra("tiempo", (Serializable) tiempo);
+        intent.putExtra("json", String.valueOf(jsono));
+        startActivity(intent);
+
+
     }
 }
 

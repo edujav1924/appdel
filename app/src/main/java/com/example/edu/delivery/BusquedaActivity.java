@@ -1,8 +1,6 @@
 package com.example.edu.delivery;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.drm.DrmStore;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,24 +13,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.widget.Toast.LENGTH_LONG;
 
 public class BusquedaActivity extends AppCompatActivity{
     JSONArray jsono;
@@ -43,14 +31,22 @@ public class BusquedaActivity extends AppCompatActivity{
     TextView result_text;
     WebView web;
     RecyclerAdapter adapter;
-    List<String> filter_distancias=new ArrayList<>();
-    List<String> direcciones=new ArrayList<>();
-    List<String> tiempo=new ArrayList<>();
-    List<String> distancias=new ArrayList<>();
+    ArrayList<String> filter_distancias=new ArrayList<>();
+    ArrayList<String> direcciones=new ArrayList<>();
+    ArrayList<String> tiempo=new ArrayList<>();
+    ArrayList<String> distancias=new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_busqueda);
+        distancias= getIntent().getExtras().getStringArrayList("distancias");
+        tiempo = getIntent().getExtras().getStringArrayList("tiempo");
+        direcciones = getIntent().getExtras().getStringArrayList("direcciones");
+        try {
+            jsono = new JSONArray(getIntent().getExtras().getString("json"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         Toolbar toolbar2 = findViewById(R.id.toolbar2);
         toolbar2.setNavigationIcon(R.drawable.ic_menu);
         setSupportActionBar(toolbar2);
@@ -61,14 +57,7 @@ public class BusquedaActivity extends AppCompatActivity{
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecyclerAdapter(this);
         recyclerView.setAdapter(adapter);
-        getdata();
-
-        /*String[] countryNames = {"Seleccione", "Hamburguesa normal", "Hamburguesa completa", "coca cola", "lomito", "papas fritas", "cerveza", "empanada"};
-        String[] subs = {"0", "7000", "10000", "5000", "15000", "5000", "8000", "2000"};
-        for (int i = 0; i < di.length; i++) {
-            producto.add(countryNames[i]);
-            precio.add(Integer.valueOf(subs[i]));
-        }*/
+        adapter.setItems(jsono,distancias);
         searchView = findViewById(R.id.search_view);
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
 
@@ -83,7 +72,7 @@ public class BusquedaActivity extends AppCompatActivity{
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (hasSubstring(jsono,newText)){
-                    result_text.setText("No se encontraron resultados");
+                    result_text.setText(("No se encontraron resultados"));
                     result_text.setVisibility(View.VISIBLE);
                 }
                 else {
@@ -92,7 +81,6 @@ public class BusquedaActivity extends AppCompatActivity{
                 return false;
             }
         });
-
         searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
             @Override
             public void onSearchViewShown() {
@@ -104,107 +92,6 @@ public class BusquedaActivity extends AppCompatActivity{
                 //Do some magic
             }
         });
-    }
-
-    public void getdata() {
-        RequestQueue queue2 = Volley.newRequestQueue(this);
-        String url ="http://192.168.43.158:8000/empresa.json";
-        final ProgressDialog dialog2 = ProgressDialog.show(this, "Descargando datos",
-                "Cargando", true);
-        dialog2.show();
-        StringRequest stringRequest2 = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        dialog2.dismiss();
-                        try {
-                            jsono = new JSONArray(response);
-
-                            for (int i=0;i<jsono.length();i++){
-                                latitud.add(jsono.getJSONObject(i).getString("latitud"));
-                                longitud.add(jsono.getJSONObject(i).getString("longitud"));
-                            }
-                            getdirections(jsono);
-                            /*for (int i=0;i<jsono.length();i++){
-                                Log.e("value", String.valueOf(jsono.getJSONObject(i).getJSONArray("productos")));
-                                for (int j=0;j<jsono.length();j++){
-                                    Log.e("value", String.valueOf(jsono.getJSONObject(i).getJSONArray("productos").getJSONObject(j).getString("producto")));
-                                }
-                            }*/
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Log.e("Error1","Error1");
-                            dialog2.dismiss();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                dialog2.dismiss();
-                Toast.makeText(getApplicationContext(),
-                        "error del servidor",
-                        LENGTH_LONG).show();
-            }
-        });
-        queue2.add(stringRequest2);
-    }
-    public void getdirections(final JSONArray other) {
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "http://maps.googleapis.com/maps/api/distancematrix/json?units=meter&origins=-25.267376,-57.492435&destinations=";
-        for (int j=0;j<latitud.size();j++){
-            url = url + longitud.get(j) +"%2C"+latitud.get(j)+"%7C";
-        }
-        Log.e("url",url);
-        //String url ="http://maps.googleapis.com/maps/api/distancematrix/json?units=meter&origins=40.6655101,-73.89188969999998&destinations=40.6905615%2C-73.9976592";
-        final ProgressDialog dialog = ProgressDialog.show(this, "Descargando datos del Servidor",
-                "Cargando", true);
-        dialog.show();
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsono = new JSONObject(response);
-                            JSONArray arrayLocales = jsono.getJSONArray("destination_addresses");
-                            for (int i=0;i<arrayLocales.length();i++){
-                                direcciones.add(arrayLocales.getString(i));
-                            }
-                            JSONArray milocation = jsono.getJSONArray("origin_addresses");
-                            JSONArray elements = jsono.getJSONArray("rows").getJSONObject(0).getJSONArray("elements");
-                            for (int i=0;i<elements.length();i++){
-                                JSONObject aux3 =elements.getJSONObject(i).getJSONObject("distance");
-                                distancias.add(aux3.getString("text"));
-                                aux3 = elements.getJSONObject(i).getJSONObject("duration");
-                                tiempo.add(aux3.getString("text"));
-                                //Log.e("get", aux3.getString("text"));
-
-                            }
-                            adapter.setItems(other,distancias);
-                            adapter.notifyDataSetChanged();
-                            dialog.dismiss();
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Log.e("Error1","Error1");
-                            dialog.dismiss();
-                        }
-
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Error2","Error2");
-
-                dialog.dismiss();
-                Toast.makeText(getApplicationContext(),
-                        "error del servidor",
-                        LENGTH_LONG).show();
-
-            }
-        });
-        queue.add(stringRequest);
     }
 
     public boolean hasSubstring(JSONArray c, String substring) {
@@ -246,7 +133,7 @@ public class BusquedaActivity extends AppCompatActivity{
         public boolean onMenuItemClick(MenuItem menuItem) {
             Log.e("sd","pulsado");
             Uri uri = Uri.parse("https://www.google.com/maps/d/viewer?mid=136OvfGkpWnvZP6G1uDAmw_AWx-1JNHqJ&ll=-25.28863824629068%2C-57.51148585000004&z=15");
-            Intent newintent = new Intent(getIntent().ACTION_VIEW,uri);
+            Intent newintent = new Intent(Intent.ACTION_VIEW,uri);
             startActivity(newintent);
             return false;
         }
