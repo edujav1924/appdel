@@ -2,6 +2,7 @@ package com.example.edu.delivery;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -18,8 +19,13 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker;
+import com.shashank.sony.fancydialoglib.Animation;
+import com.shashank.sony.fancydialoglib.FancyAlertDialog;
+import com.shashank.sony.fancydialoglib.FancyAlertDialogListener;
+import com.shashank.sony.fancydialoglib.Icon;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -212,7 +218,7 @@ public class ScrollingActivity extends AppCompatActivity {
         }
     }
     private void showAlert(final int id) {
-        final android.support.v7.app.AlertDialog.Builder dialog = new android.support.v7.app.AlertDialog.Builder(this);
+       /* final android.support.v7.app.AlertDialog.Builder dialog = new android.support.v7.app.AlertDialog.Builder(this);
         dialog.setTitle("Pedido")
                 .setMessage("Desea quitar '"+cant_list.get(id)+" "+pedido_list.get(id)+"'s de la lista de pedidos?")
                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
@@ -234,7 +240,38 @@ public class ScrollingActivity extends AppCompatActivity {
 
                     }
                 });
-        dialog.show();
+        dialog.show();*/
+        new FancyAlertDialog.Builder(this)
+                .setTitle("Pedido")
+                .setBackgroundColor(Color.parseColor("#42a1f4"))  //Don't pass R.color.colorvalue
+                .setMessage("Desea quitar '"+cant_list.get(id)+" "+pedido_list.get(id)+"s' de la lista de pedidos?")
+                .setNegativeBtnText("Cancelar")
+                .setPositiveBtnBackground(Color.parseColor("#42a1f4"))  //Don't pass R.color.colorvalue
+                .setPositiveBtnText("Eliminar")
+                .setNegativeBtnBackground(Color.parseColor("#FFA9A7A8"))  //Don't pass R.color.colorvalue
+                .setAnimation(Animation.POP)
+                .isCancellable(true)
+                .setIcon(R.drawable.ic_info_outline_black_24dp, Icon.Visible)
+                .OnPositiveClicked(new FancyAlertDialogListener() {
+                    @Override
+                    public void OnClick() {
+                        pedido_list.remove(id);
+                        precio_list.remove(id);
+                        cant_list.remove(id);
+                        total();
+                        listviews();
+                        Utility.setListViewHeightBasedOnChildren(pedidos_seleccionados);
+                    }
+                })
+                .OnNegativeClicked(new FancyAlertDialogListener() {
+                    @Override
+                    public void OnClick() {
+                        Toast.makeText(getApplicationContext(),"Cancel",Toast.LENGTH_SHORT).show();
+
+                    }
+                })
+                .build();
+
 
     }
 

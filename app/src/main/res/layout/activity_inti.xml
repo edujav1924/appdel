@@ -29,22 +29,29 @@
             android:id="@+id/text_init"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/MKLoader"
+            android:layout_below="@+id/imageView7"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="15dp"
-            android:text="Espere un momento por favor ..."
+            android:text="Obteniendo ubicacion.."
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
-        <com.tuyenmonkey.mkloader.MKLoader
-            android:id="@+id/MKLoader"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+        <TextView
+            android:id="@+id/locationgps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/imageView7"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="126dp"
-            app:mk_color="@color/white"
-            app:mk_type="Sharingan" />
+            android:layout_marginTop="35dp"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/locationnet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/locationgps"
+            android:layout_below="@+id/locationgps"
+            android:layout_marginTop="27dp"
+            android:text="TextView" />
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
