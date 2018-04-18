@@ -29,8 +29,9 @@
             android:id="@+id/text_init"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/imageView7"
+            android:layout_above="@+id/locationgps"
             android:layout_centerHorizontal="true"
+            android:layout_marginBottom="14dp"
             android:text="Obteniendo ubicacion.."
             android:textAlignment="center"
             android:textColor="@color/white"
@@ -40,18 +41,26 @@
             android:id="@+id/locationgps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/imageView7"
+            android:layout_above="@+id/locationnet"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="35dp"
+            android:layout_marginBottom="19dp"
             android:text="TextView" />
 
         <TextView
             android:id="@+id/locationnet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:layout_alignStart="@+id/locationgps"
-            android:layout_below="@+id/locationgps"
-            android:layout_marginTop="27dp"
+            android:layout_marginBottom="101dp"
             android:text="TextView" />
+
+        <com.medialablk.easygifview.EasyGifView
+            android:id="@+id/easyGifView"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_above="@+id/text_init"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="12dp" />
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

@@ -18,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.medialablk.easygifview.EasyGifView;
 import com.shashank.sony.fancydialoglib.Animation;
 import com.shashank.sony.fancydialoglib.FancyAlertDialog;
 import com.shashank.sony.fancydialoglib.FancyAlertDialogListener;
@@ -64,11 +66,13 @@ public class inti extends AppCompatActivity {
     private LocationCallback mLocationCallback;
     private boolean mRequestingLocationUpdates=true;
     LocationManager manager;
-
+    EasyGifView easyGifView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inti);
+        easyGifView= findViewById(R.id.easyGifView);
+        easyGifView.setVisibility(View.GONE);
         texto_init = findViewById(R.id.text_init);
         locationnet = findViewById(R.id.locationnet);
         locationgps = findViewById(R.id.locationgps);
@@ -86,7 +90,18 @@ public class inti extends AppCompatActivity {
         }
 
     }
+    private void errors(String a){
+        texto_init.setText(a);
+        easyGifView.setVisibility(View.GONE);
 
+    }
+    private void onload(){
+        easyGifView.setGifFromResource(R.drawable.dualring);
+        easyGifView.setVisibility(View.VISIBLE);
+    }
+    private  void  offload(){
+        easyGifView.setVisibility(View.GONE);
+    }
     private void getlocation() {
         Log.e("status", "1");
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -117,6 +132,7 @@ public class inti extends AppCompatActivity {
         createLocationRequest();
         startLocationUpdates();
 
+
     }
     @Override
     public void onPause() {
@@ -127,14 +143,20 @@ public class inti extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            showAlert();
+        }
+        else {
+            onload();
+        }
 
 
     }
 
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setInterval(100);
+        mLocationRequest.setFastestInterval(100);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         SettingsClient client = LocationServices.getSettingsClient(this);
@@ -145,7 +167,7 @@ public class inti extends AppCompatActivity {
                 Log.e("entre","entre");
                 if (!locationSettingsResponse.getLocationSettingsStates().isGpsUsable()){
                     Log.e("soy yo","1");
-                    showAlert();
+
                 }
             }
         });
@@ -167,7 +189,6 @@ public class inti extends AppCompatActivity {
             }
         });
     }
-
 
     private void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
@@ -228,15 +249,16 @@ public class inti extends AppCompatActivity {
                             }*/
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            texto_init.setText("Hubo un error al recibir datos del servidor");
+                           errors("Hubo un error al recibir datos del servidor");
                             Log.e("Error1","Error1");
+                            offload();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                texto_init.setText("no fue posible establecer contacto con el servidor");
-
+                errors("no fue posible establecer contacto con el servidor");
+                offload();
             }
         });
         queue2.add(stringRequest2);
@@ -278,6 +300,7 @@ public class inti extends AppCompatActivity {
                             desarrollo(direcciones,distancias,tiempo,jsono);
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            offload();
                             texto_init.setText("Hubo un error al recibir datos de localizacion");
                         }
                     }
@@ -285,6 +308,7 @@ public class inti extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 texto_init.setText("no fue posible obtener datos de localizacion");
+                offload();
             }
         });
         queue.add(stringRequest);
@@ -324,7 +348,6 @@ public class inti extends AppCompatActivity {
                 .OnNegativeClicked(new FancyAlertDialogListener() {
                     @Override
                     public void OnClick() {
-                        Toast.makeText(getApplicationContext(),"Cancel",Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 })
