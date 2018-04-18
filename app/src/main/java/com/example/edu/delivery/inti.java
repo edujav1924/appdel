@@ -109,6 +109,7 @@ public class inti extends AppCompatActivity {
                         Log.e("loation",String.valueOf(location.getAccuracy()));
                         texto_init.setText("obteniendo datos ..");
                         getdata(latitud,longitud);
+                        stopLocationUpdates();
                     }
                 }
             };
@@ -291,7 +292,6 @@ public class inti extends AppCompatActivity {
 
     private void desarrollo(List<String> direcciones, List<String> distancias, List<String> tiempo, JSONArray jsono) {
         Intent intent = new Intent(inti.this, BusquedaActivity.class);
-        stopLocationUpdates();
         intent.putExtra("direcciones", (Serializable) direcciones);
         intent.putExtra("distancias", (Serializable) distancias);
         intent.putExtra("tiempo", (Serializable) tiempo);
@@ -325,7 +325,7 @@ public class inti extends AppCompatActivity {
                     @Override
                     public void OnClick() {
                         Toast.makeText(getApplicationContext(),"Cancel",Toast.LENGTH_SHORT).show();
-
+                        finish();
                     }
                 })
                 .build();
