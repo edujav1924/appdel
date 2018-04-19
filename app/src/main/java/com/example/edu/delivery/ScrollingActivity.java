@@ -197,7 +197,6 @@ public class ScrollingActivity extends AppCompatActivity {
             JSONArray jsonArr = new JSONArray();
             for(int i = 0;i<pedido_list.size();i++){
                 JSONObject pedidos = new JSONObject();
-
                 try {
                     pedidos.put("producto",pedido_list.get(i));
                     pedidos.put("cantidad",cant_list.get(i));
