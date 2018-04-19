@@ -22,7 +22,7 @@
                     android:translateX="-197.60001">
                     <path
                         android:name="rect2"
-                        android:fillColor="#AA44Fa"
+                        android:fillColor="#ffffff"
                         android:pathData="M -144,-1 l 288,0 l 0,2 l -288,0 Z"/>
                 </group>
                 <group

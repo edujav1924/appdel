@@ -12,8 +12,10 @@ import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -67,10 +69,11 @@ public class inti extends AppCompatActivity {
     TextView texto_init, locationgps, locationnet;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 12;
     private LocationCallback mLocationCallback;
-    private boolean mRequestingLocationUpdates=true;
+    private boolean mRequestingLocationUpdates = true;
     LocationManager manager;
     ImageView load;
     Drawable drawable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +83,7 @@ public class inti extends AppCompatActivity {
         texto_init = findViewById(R.id.text_init);
         locationnet = findViewById(R.id.locationnet);
         locationgps = findViewById(R.id.locationgps);
-        manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -90,64 +93,115 @@ public class inti extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         } else {
-            getlocation();
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         }
 
     }
-    private void errors(String a){
+
+    private void errors(String a) {
         texto_init.setText(a);
 
 
     }
-    private void onload(){
+
+    public void nubication(View view) {
+        getlocation();
+        onload();
+        findViewById(R.id.lastu).setEnabled(false);
+    }
+
+    public void lubication(View view) {
+        findViewById(R.id.newu).setEnabled(false);
+        lastlocation();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.DONUT)
+    private void onload() {
         drawable = load.getDrawable();
         if (drawable instanceof Animatable) {
-            Log.e("entre","entre");
+            Log.e("entre", "entre");
             ((Animatable) drawable).start();
             load.setVisibility(View.VISIBLE);
         }
     }
-    private  void  offload(){
+
+    @RequiresApi(api = Build.VERSION_CODES.DONUT)
+    private void offload() {
         drawable = load.getDrawable();
         if (drawable instanceof Animatable) {
-            Log.e("entre","entre");
+            Log.e("entre", "entre");
             ((Animatable) drawable).stop();
 
         }
         ((Animatable) drawable).stop();
         load.setVisibility(View.GONE);
     }
+
     private void getlocation() {
         Log.e("status", "1");
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mLocationCallback = new LocationCallback() {
 
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Log.e("result", String.valueOf(locationResult));
                 if (locationResult == null) {
-                    Log.e("loation","null");
+                    Log.e("loation", "null");
 
                 }
                 for (Location location : locationResult.getLocations()) {
-                    String latitud =location.convert(location.getLatitude(),0);
-                    String longitud =location.convert(location.getLongitude(),0);
+                    String latitud = location.convert(location.getLatitude(), 0);
+                    String longitud = location.convert(location.getLongitude(), 0);
 
-                    locationgps.setText(latitud+" "+longitud);
+                    locationgps.setText(latitud + " " + longitud);
                     locationnet.setText(String.valueOf(location.getAccuracy()));
-                    if(location.getAccuracy()<=25.0){
-                        Log.e("loation",String.valueOf(location.getAccuracy()));
+                    if (location.getAccuracy() <= 25.0) {
+                        Log.e("loation", String.valueOf(location.getAccuracy()));
                         texto_init.setText("obteniendo datos ..");
-                        getdata(latitud,longitud);
+                        getdata(latitud, longitud);
                         stopLocationUpdates();
                     }
                 }
-            };
+            }
+
+            ;
         };
         createLocationRequest();
         startLocationUpdates();
+        texto_init.setText("obteniendo ubicacion");
 
 
+    }
+
+    private void lastlocation() {
+        Log.e("lastlocation","kasasa");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            String latitud = location.convert(location.getLatitude(), 0);
+                            String longitud = location.convert(location.getLongitude(), 0);
+                            Log.e("lastlocation", String.valueOf(location));
+                            getdata(latitud, longitud);
+                        }
+                        else {
+                            getlocation();
+                            onload();
+
+                        }
+                    }
+                });
     }
     @Override
     public void onPause() {
@@ -155,6 +209,7 @@ public class inti extends AppCompatActivity {
 
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.DONUT)
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
@@ -162,7 +217,7 @@ public class inti extends AppCompatActivity {
             showAlert();
         }
         else {
-            onload();
+
         }
 
 
@@ -187,6 +242,7 @@ public class inti extends AppCompatActivity {
             }
         });
         task.addOnFailureListener(this, new OnFailureListener() {
+            @RequiresApi(api = Build.VERSION_CODES.DONUT)
             @Override
             public void onFailure(@NonNull Exception e) {
                 if (e instanceof ResolvableApiException) {
@@ -244,6 +300,7 @@ public class inti extends AppCompatActivity {
         String url ="http://192.168.43.158:8000/empresa.json";
         StringRequest stringRequest2 = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
+                    @RequiresApi(api = Build.VERSION_CODES.DONUT)
                     @Override
                     public void onResponse(String response) {
 
@@ -270,6 +327,7 @@ public class inti extends AppCompatActivity {
                         }
                     }
                 }, new Response.ErrorListener() {
+            @RequiresApi(api = Build.VERSION_CODES.DONUT)
             @Override
             public void onErrorResponse(VolleyError error) {
                 errors("no fue posible establecer contacto con el servidor");
@@ -291,6 +349,7 @@ public class inti extends AppCompatActivity {
         //String url ="http://maps.googleapis.com/maps/api/distancematrix/json?units=meter&origins=40.6655101,-73.89188969999998&destinations=40.6905615%2C-73.9976592";
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
+                    @RequiresApi(api = Build.VERSION_CODES.DONUT)
                     @Override
                     public void onResponse(String response) {
                         List<String> direcciones=new ArrayList<>();
