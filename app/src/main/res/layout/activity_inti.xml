@@ -55,12 +55,14 @@
             android:layout_marginBottom="101dp"
             android:text="TextView" />
 
-        <com.medialablk.easygifview.EasyGifView
-            android:id="@+id/easyGifView"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+        <ImageView
+            android:id="@+id/loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_above="@+id/text_init"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="12dp" />
+            app:srcCompat="@drawable/ic_edu" />
+
+
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

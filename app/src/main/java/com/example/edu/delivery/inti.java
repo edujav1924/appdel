@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.provider.Settings;
@@ -19,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,13 +69,14 @@ public class inti extends AppCompatActivity {
     private LocationCallback mLocationCallback;
     private boolean mRequestingLocationUpdates=true;
     LocationManager manager;
-    EasyGifView easyGifView;
+    ImageView load;
+    Drawable drawable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inti);
-        easyGifView= findViewById(R.id.easyGifView);
-        easyGifView.setVisibility(View.GONE);
+        load = findViewById(R.id.loading);
+        load.setVisibility(View.GONE);
         texto_init = findViewById(R.id.text_init);
         locationnet = findViewById(R.id.locationnet);
         locationgps = findViewById(R.id.locationgps);
@@ -92,15 +96,26 @@ public class inti extends AppCompatActivity {
     }
     private void errors(String a){
         texto_init.setText(a);
-        easyGifView.setVisibility(View.GONE);
+
 
     }
     private void onload(){
-        easyGifView.setGifFromResource(R.drawable.dualring);
-        easyGifView.setVisibility(View.VISIBLE);
+        drawable = load.getDrawable();
+        if (drawable instanceof Animatable) {
+            Log.e("entre","entre");
+            ((Animatable) drawable).start();
+            load.setVisibility(View.VISIBLE);
+        }
     }
     private  void  offload(){
-        easyGifView.setVisibility(View.GONE);
+        drawable = load.getDrawable();
+        if (drawable instanceof Animatable) {
+            Log.e("entre","entre");
+            ((Animatable) drawable).stop();
+
+        }
+        ((Animatable) drawable).stop();
+        load.setVisibility(View.GONE);
     }
     private void getlocation() {
         Log.e("status", "1");
@@ -264,7 +279,7 @@ public class inti extends AppCompatActivity {
         queue2.add(stringRequest2);
     }
 
-    private void getdirections(final JSONArray jsono, List<String> latitud, List<String> longitud, String latitudcel, String longitudcel) {
+    private void getdirections(final JSONArray jsono, List<String> latitud, List<String> longitud, final String latitudcel, final String longitudcel) {
         texto_init.setText("obteniendo localizacion...");
 
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -297,7 +312,7 @@ public class inti extends AppCompatActivity {
                                 //Log.e("get", aux3.getString("text"));
                             }
                             texto_init.setText("Finalizado");
-                            desarrollo(direcciones,distancias,tiempo,jsono);
+                            desarrollo(direcciones,distancias,tiempo,jsono,longitudcel,latitudcel);
                         } catch (JSONException e) {
                             e.printStackTrace();
                             offload();
@@ -314,12 +329,14 @@ public class inti extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
-    private void desarrollo(List<String> direcciones, List<String> distancias, List<String> tiempo, JSONArray jsono) {
+    private void desarrollo(List<String> direcciones, List<String> distancias, List<String> tiempo, JSONArray jsono, String longitudcel, String latitudcel) {
         Intent intent = new Intent(inti.this, BusquedaActivity.class);
         intent.putExtra("direcciones", (Serializable) direcciones);
         intent.putExtra("distancias", (Serializable) distancias);
         intent.putExtra("tiempo", (Serializable) tiempo);
         intent.putExtra("json", String.valueOf(jsono));
+        intent.putExtra("latitud", latitudcel);
+        intent.putExtra("longitud",longitudcel);
         //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         ActivityCompat.finishAffinity(this);
         startActivity(intent);

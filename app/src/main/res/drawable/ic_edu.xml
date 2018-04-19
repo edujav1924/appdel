@@ -1,12 +1,70 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-        android:width="80dp"
-        android:height="80dp"
-        android:viewportWidth="100.0"
-        android:viewportHeight="100.0">
-    <path
-        android:pathData="M35.2,53.41L35.2,59.41L26.8,59.41L26.8,53.41A22.8,22.8 0,0 1,18.12 49.82L18.12,49.82L13.88,54.06L7.94,48.12L12.18,43.88A22.8,22.8 52.33,0 1,8.59 35.2L8.59,35.2L2.59,35.2L2.59,26.8L8.59,26.8A22.8,22.8 127.67,0 1,12.18 18.12L12.18,18.12L7.94,13.88L13.88,7.94L18.12,12.18A22.8,22.8 0,0 1,26.8 8.59L26.8,8.59L26.8,2.59L35.2,2.59L35.2,8.59A22.8,22.8 115.93,0 1,43.88 12.18L43.88,12.18L48.12,7.94L54.06,13.88L49.82,18.12A22.8,22.8 0,0 1,53.41 26.8L53.41,26.8L59.41,26.8L59.41,35.2L53.41,35.2A22.8,22.8 68.15,0 1,49.82 43.88L49.82,43.88L54.06,48.12L48.12,54.06L43.88,49.82A22.8,22.8 115.93,0 1,35.2 53.41M44.8,31A13.8,13.8 60.85,1 0,17.2 31A13.8,13.8 60.85,1 0,44.8 31"
-        android:fillColor="#719b69"/>
-    <path
-        android:pathData="M56.54,49.9L54.25,44.36L62.01,41.15L64.3,46.69A22.8,22.8 0,0 1,73.7 46.69L73.7,46.69L75.99,41.15L83.75,44.36L81.46,49.9A22.8,22.8 0,0 1,88.1 56.54L88.1,56.54L93.64,54.25L96.85,62.01L91.31,64.3A22.8,22.8 0,0 1,91.31 73.7L91.31,73.7L96.85,75.99L93.64,83.75L88.1,81.46A22.8,22.8 0,0 1,81.46 88.1L81.46,88.1L83.75,93.64L75.99,96.85L73.7,91.31A22.8,22.8 70.82,0 1,64.3 91.31L64.3,91.31L62.01,96.85L54.25,93.64L56.54,88.1A22.8,22.8 52.33,0 1,49.9 81.46L49.9,81.46L44.36,83.75L41.15,75.99L46.69,73.7A22.8,22.8 0,0 1,46.69 64.3L46.69,64.3L41.15,62.01L44.36,54.25L49.9,56.54A22.8,22.8 0,0 1,56.54 49.9M56.25,74.28A13.8,13.8 71.92,1 0,81.75 63.72A13.8,13.8 71.92,1 0,56.25 74.28"
-        android:fillColor="#a1a6a8"/>
-</vector>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt" >
+
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="360dp"
+            android:height="50dp"
+            android:viewportHeight="10"
+            android:viewportWidth="360">
+            <group
+                android:name="progress_group"
+                android:translateX="180"
+                android:translateY="5">
+                <path
+                    android:name="background_track"
+                    android:fillAlpha="?android:attr/disabledAlpha"
+                    android:fillColor="#FF4A45"
+                    android:pathData="M -180,-1 l 360,0 l 0,2 l -360,0 Z"/>
+                <group
+                    android:name="rect2_grp"
+                    android:scaleX="0.1"
+                    android:translateX="-197.60001">
+                    <path
+                        android:name="rect2"
+                        android:fillColor="#AA44Fa"
+                        android:pathData="M -144,-1 l 288,0 l 0,2 l -288,0 Z"/>
+                </group>
+                <group
+                    android:name="rect1_grp"
+                    android:scaleX="0.1"
+                    android:translateX="-522.59998">
+                    <path
+                        android:name="rect1"
+                        android:fillColor="?attr/colorControlActivated"
+                        android:pathData="M -144,-1 l 288,0 l 0,2 l -288,0 Z"/>
+                </group>
+            </group>
+        </vector>
+    </aapt:attr>
+
+    <target android:name="rotationGroup"> *
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="1000"
+                android:propertyName="rotation"
+                android:valueFrom="0"
+                android:valueTo="360" />
+        </aapt:attr>
+    </target>
+
+    <target android:name="rect2_grp" >
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="1000"
+                    android:pathData="M -197.60001,0 c 14.28182,0 85.07782,0 135.54689,0 c 54.26191,0 90.42461,0 168.24331,0 c 144.72154,0 316.40982,0 316.40982,0"
+                    android:propertyXName="translateX"
+                    android:repeatCount="infinite">
+                </objectAnimator>
+                <objectAnimator
+                    android:duration="1000"
+                    android:pathData="M 0,0.1 L 1,0.571379510698 L 2,0.909950256348 L 3,0.1"
+                    android:propertyYName="scaleX"
+                    android:repeatCount="infinite">
+                </objectAnimator>
+            </set>
+        </aapt:attr>
+    </target>
+
+</animated-vector>

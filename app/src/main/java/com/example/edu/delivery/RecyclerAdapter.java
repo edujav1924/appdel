@@ -23,16 +23,18 @@ import java.util.List;
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.RecyclerHolder> {
 
     private static final int LAYOUT = R.layout.reciclercell;
-    private String textos,textos2 = "";
     private final ExpansionLayoutCollection expansionsCollection = new ExpansionLayoutCollection();
     private JSONArray jsonarray = new JSONArray();
     private List<String> distancias=new ArrayList<>();
     private Context context;
+    private String lat, lon;
 
-    public void setItems(JSONArray jsono, List<String> distancias) {
+    public void setItems(JSONArray jsono, List<String> distancias, String lat, String lon) {
         this.jsonarray = jsono;
         this.distancias.clear();
         this.distancias.addAll(distancias);
+        this.lat = lat;
+        this.lon = lon;
     }
     public RecyclerAdapter(BusquedaActivity busquedaActivity) {
         this.context = busquedaActivity;
@@ -49,7 +51,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     public void onBindViewHolder(RecyclerHolder holder, int position) {
         String text = "";
         try {
-
+            Log.e("pos", String.valueOf(jsonarray.getJSONObject(position).getString("latitud")));
             for (int j=0;j<jsonarray.getJSONObject(position).getJSONArray("productos").length();j++){
                 try {
                     text = text + String.valueOf(jsonarray.getJSONObject(position).getJSONArray("productos").getJSONObject(j).getString("producto")+"\n");
@@ -120,9 +122,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
             btnmap.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Uri uri = Uri.parse("https://www.google.com/maps/dir/-25.2669752,-57.505732/-25.265015,-57.512561/@-25.2663761,-57.513863,16z/data=!3m1!4b1");
-                    Intent newintent = new Intent(Intent.ACTION_VIEW,uri);
-                    context.startActivity(newintent);
+                    try {
+                        String longi = jsonarray.getJSONObject(getAdapterPosition()).getString("latitud");
+                        String lati = jsonarray.getJSONObject(getAdapterPosition()).getString("longitud");
+                        Uri uri = Uri.parse("https://www.google.com/maps/dir/"+lat+","+lon+"/"+lati+","+longi+"/");
+                        Intent newintent = new Intent(Intent.ACTION_VIEW,uri);
+                        context.startActivity(newintent);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             });
         }

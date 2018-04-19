@@ -20,21 +20,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class BusquedaActivity extends AppCompatActivity{
     JSONArray jsono;
     RecyclerView recyclerView;
-    ArrayList<String> latitud= new ArrayList<>();
-    ArrayList<String> longitud = new ArrayList<String>();
     MaterialSearchView searchView;
     TextView result_text;
-    WebView web;
     RecyclerAdapter adapter;
-    ArrayList<String> filter_distancias=new ArrayList<>();
     ArrayList<String> direcciones=new ArrayList<>();
     ArrayList<String> tiempo=new ArrayList<>();
     ArrayList<String> distancias=new ArrayList<>();
+    String lat,lon;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +38,8 @@ public class BusquedaActivity extends AppCompatActivity{
         distancias= getIntent().getExtras().getStringArrayList("distancias");
         tiempo = getIntent().getExtras().getStringArrayList("tiempo");
         direcciones = getIntent().getExtras().getStringArrayList("direcciones");
+        lat = getIntent().getExtras().getString("latitud");
+        lon = getIntent().getExtras().getString("longitud");
         try {
             jsono = new JSONArray(getIntent().getExtras().getString("json"));
         } catch (JSONException e) {
@@ -57,15 +55,11 @@ public class BusquedaActivity extends AppCompatActivity{
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecyclerAdapter(this);
         recyclerView.setAdapter(adapter);
-        adapter.setItems(jsono,distancias);
+        adapter.setItems(jsono,distancias,lat,lon);
         searchView = findViewById(R.id.search_view);
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
-
-
             @Override
             public boolean onQueryTextSubmit(String query) {
-
-
                 return true;
             }
 
@@ -105,7 +99,7 @@ public class BusquedaActivity extends AppCompatActivity{
                 e.printStackTrace();
             }
         }
-        adapter.setItems(customjson, distancias);
+        adapter.setItems(customjson, distancias, lat, lon);
         adapter.notifyDataSetChanged();
         if(customjson.length()>0){
             return false;
