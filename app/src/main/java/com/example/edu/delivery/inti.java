@@ -1,6 +1,7 @@
 package com.example.edu.delivery;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -141,6 +142,7 @@ public class inti extends AppCompatActivity {
         Log.e("status", "1");
         mLocationCallback = new LocationCallback() {
 
+            @SuppressLint("SetTextI18n")
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null) {
@@ -152,7 +154,7 @@ public class inti extends AppCompatActivity {
                     String longitud = location.convert(location.getLongitude(), 0);
 
                     locationgps.setText(latitud + " " + longitud);
-                    locationnet.setText(String.valueOf(location.getAccuracy()));
+                    locationnet.setText("aproximando a: "+String.valueOf(location.getAccuracy())+" metros");
                     if (location.getAccuracy() <= 25.0) {
                         Log.e("loation", String.valueOf(location.getAccuracy()));
                         texto_init.setText("obteniendo datos ..");

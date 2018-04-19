@@ -29,6 +29,7 @@ import com.shashank.sony.fancydialoglib.Icon;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -191,6 +192,21 @@ public class ScrollingActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        if(id == R.id.action_send){
+            JSONArray jsonArr = new JSONArray();
+            for(int i = 0;i<pedido_list.size();i++){
+                JSONObject pedidos = new JSONObject();
+
+                try {
+                    pedidos.put("producto",pedido_list.get(i));
+                    pedidos.put("cantidad",cant_list.get(i));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                jsonArr.put(pedidos);
+            }
+
         }
         return super.onOptionsItemSelected(item);
     }

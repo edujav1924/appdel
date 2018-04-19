@@ -40,7 +40,9 @@
             android:id="@+id/locationgps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="182dp"
             android:text="TextView" />
 
         <TextView
@@ -49,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="237dp"
+            android:layout_marginBottom="89dp"
             android:text="TextView" />
 
         <ImageView
@@ -66,10 +68,13 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="52dp"
-            android:layout_marginTop="197dp"
+            android:layout_marginStart="37dp"
+            android:layout_marginTop="199dp"
             android:background="@color/colorPrimaryDark"
+            android:fontFamily="@font/abhaya_libre"
             android:onClick="lubication"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:text="Ultima ubicacion"
             android:textColor="@color/white" />
 
@@ -79,9 +84,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/lastu"
-            android:layout_marginEnd="60dp"
+            android:layout_marginEnd="42dp"
             android:background="@color/colorPrimaryDark"
+            android:fontFamily="@font/abhaya_libre"
             android:onClick="nubication"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:text="Nueva ubicacion"
             android:textColor="@color/white" />
 

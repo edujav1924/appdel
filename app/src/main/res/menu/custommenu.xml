@@ -4,10 +4,10 @@
     tools:context="com.example.edu.delivery.ScrollingActivity">
     <!-- "Mark Favorite", should appear as action button if possible -->
     <item
-        android:id="@+id/action_favorite"
+        android:id="@+id/action_send"
         android:icon="@drawable/ic_send_black_24dp"
         android:title="hola"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 
     <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_settings"
