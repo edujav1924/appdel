@@ -21,7 +21,7 @@
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/aclonica"
+            android:fontFamily="@font/almendra"
             android:text="Complete estos campos"
             android:textAlignment="center"
             android:textSize="24sp"
@@ -37,6 +37,8 @@
             app:errorColor="@color/errorcolor"
             app:helperTextColor="#d43800"
             app:primaryColor="#002fed"
+            app:secondaryColor="@color/actionSuccessShine"
+
             app:hasClearButton="true">
 
             <studio.carbonylgroup.textfieldboxes.ExtendedEditText
@@ -59,10 +61,11 @@
             app:labelText="Apellido"
             app:maxCharacters="10"
             app:minCharacters="3"
+            app:secondaryColor="@color/actionSuccessShine"
             app:primaryColor="#002fed">
 
             <studio.carbonylgroup.textfieldboxes.ExtendedEditText
-                android:id="@+id/extended_edit_apellido"
+                android:id="@+id/box_edit_apellido"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:digits="abcdefghijklmnñopqrstuvwxyz"
@@ -79,11 +82,13 @@
             app:hasClearButton="true"
             app:errorColor="@color/errorcolor"
             app:helperTextColor="#d43800"
+            app:secondaryColor="@color/actionSuccessShine"
+
             app:helperText="Ej:0981xxxxxx"
             app:primaryColor="#002fed">
 
             <studio.carbonylgroup.textfieldboxes.ExtendedEditText
-                android:id="@+id/extended_edit_telefono"
+                android:id="@+id/box_edit_telefono"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"

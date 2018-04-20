@@ -30,7 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".send">
+        <activity android:name=".send" android:launchMode = "singleTask" >
 
         </activity>
     </application>

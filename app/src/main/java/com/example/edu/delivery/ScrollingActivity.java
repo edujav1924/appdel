@@ -33,6 +33,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import greco.lorenzo.com.lgsnackbar.core.LGSnackbar;
+
 
 public class ScrollingActivity extends AppCompatActivity {
     ImageView logo;
@@ -198,37 +200,50 @@ public class ScrollingActivity extends AppCompatActivity {
             return true;
         }
         if(id == R.id.action_send){
-            JSONObject customobj = new JSONObject();
-            try {
-                customobj.put("empresa",jsondata.getJSONObject(Integer.parseInt(position)).getString("empresa"));
-                customobj.put("ubicacion",
-                        "https://www.google.com/maps?q=" +
-                                getIntent().getExtras().getString("latitud")+","+getIntent().getExtras().getString("longitud"));
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            JSONArray jsonArr = new JSONArray();
-            for(int i = 0;i<pedido_list.size();i++){
-                JSONObject pedidos = new JSONObject();
+            if(!pedido_list.isEmpty()){
+                JSONObject customobj = new JSONObject();
                 try {
-                    pedidos.put("producto",pedido_list.get(i));
-                    pedidos.put("cantidad",cant_list.get(i));
+                    customobj.put("empresa",jsondata.getJSONObject(Integer.parseInt(position)).getString("empresa"));
+                    customobj.put("ubicacion",
+                            "https://www.google.com/maps?q=" +
+                                    getIntent().getExtras().getString("latitud")+","+getIntent().getExtras().getString("longitud"));
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                jsonArr.put(pedidos);
+                JSONArray jsonArr = new JSONArray();
+                for(int i = 0;i<pedido_list.size();i++){
+                    JSONObject pedidos = new JSONObject();
+                    try {
+                        pedidos.put("producto",pedido_list.get(i));
+                        pedidos.put("cantidad",cant_list.get(i));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    jsonArr.put(pedidos);
+                }
+                try {
+                    customobj.put("pedidos",jsonArr);
+                    Intent intent = new Intent(this,send.class);
+                    intent.putExtra("datos", String.valueOf(customobj));
+                    startActivity(intent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }else {
+                new LGSnackbar.LGSnackbarBuilder(getApplicationContext(), "Lista Vacia")
+                        .duration(2000)
+                        .actionTextColor(Color.RED)
+                        .backgroundColor(Color.RED)
+                        .minHeightDp(20)
+                        .textColor(Color.WHITE)
+                        .iconID(R.drawable.ic_custom_error)
+                        .callback(null)
+                        .action(null)
+                        .show();
             }
-            try {
-                customobj.put("pedidos",jsonArr);
-                Intent intent = new Intent(this,send.class);
-                intent.putExtra("datos", String.valueOf(customobj));
-                startActivity(intent);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
         }
+
         return super.onOptionsItemSelected(item);
     }
 

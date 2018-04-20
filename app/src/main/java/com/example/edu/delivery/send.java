@@ -1,6 +1,8 @@
 package com.example.edu.delivery;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,6 +32,10 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Method;
 
+import greco.lorenzo.com.lgsnackbar.LGSnackbarManager;
+import greco.lorenzo.com.lgsnackbar.core.LGSnackbar;
+import greco.lorenzo.com.lgsnackbar.style.LGSnackBarStyle;
+import greco.lorenzo.com.lgsnackbar.style.LGSnackBarTheme;
 import studio.carbonylgroup.textfieldboxes.SimpleTextChangedWatcher;
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
 
@@ -46,6 +52,7 @@ public class send extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
+
         try {
             datos = new JSONObject(getIntent().getExtras().getString("datos"));
             Log.e("datos",datos.toString());
@@ -124,13 +131,39 @@ public class send extends AppCompatActivity {
                         public void onResponse(JSONObject response) {
                             try {
                                 JSONObject jsonObject = new JSONObject(response.toString());
-                                new CDialog(send.this).createAlert(jsonObject.getString("status"),
-                                        CDConstants.SUCCESS,   // Type of dialog
-                                        CDConstants.LARGE)    //  size of dialog
-                                        .setAnimation(CDConstants.SCALE_FROM_RIGHT_TO_LEFT)     //  Animation for enter/exit
-                                        .setDuration(5000)   // in milliseconds
-                                        .setTextSize(CDConstants.NORMAL_TEXT_SIZE)  // CDConstants.LARGE_TEXT_SIZE, CDConstants.NORMAL_TEXT_SIZE
-                                        .show();
+                                String valor = jsonObject.getString("status");
+                                if (valor.equals("exitoso")){
+                                    new CDialog(send.this).createAlert(valor,
+                                            CDConstants.SUCCESS,   // Type of dialog
+                                            CDConstants.LARGE)    //  size of dialog
+                                            .setAnimation(CDConstants.SCALE_FROM_RIGHT_TO_LEFT)     //  Animation for enter/exit
+                                            .setDuration(3000)   // in milliseconds
+                                            .setTextSize(CDConstants.NORMAL_TEXT_SIZE)  // CDConstants.LARGE_TEXT_SIZE, CDConstants.NORMAL_TEXT_SIZE
+                                            .show();
+                                    Thread thread = new Thread(){
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                Thread.sleep(3500); // As I am using LENGTH_LONG in Toast
+                                                send.this.finish();
+
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    };
+                                    thread.start();
+
+                                }else {
+                                    new CDialog(send.this).createAlert(valor,
+                                            CDConstants.WARNING,   // Type of dialog
+                                            CDConstants.LARGE)    //  size of dialog
+                                            .setAnimation(CDConstants.SCALE_FROM_RIGHT_TO_LEFT)     //  Animation for enter/exit
+                                            .setDuration(5000)   // in milliseconds
+                                            .setTextSize(CDConstants.NORMAL_TEXT_SIZE)  // CDConstants.LARGE_TEXT_SIZE, CDConstants.NORMAL_TEXT_SIZE
+                                            .show();
+                                }
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -140,37 +173,59 @@ public class send extends AppCompatActivity {
 
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            // TODO: Handle error
+
                             if (error instanceof TimeoutError || error instanceof NoConnectionError) {
-                                Toast.makeText(getApplicationContext(),
-                                        "error de conexiion con el servidor",
-                                        LENGTH_LONG).show();
+                                alert("Error al conectar con el servidor",0);
                             } else if (error instanceof AuthFailureError) {
-                                Toast.makeText(getApplicationContext(),
-                                        "error de autenticacion",
-                                        LENGTH_LONG).show();
-                                //TODO
+                                alert("Error de autenticacion",0);
+
                             } else if (error instanceof ServerError) {
-                                Toast.makeText(getApplicationContext(),
-                                        "error del servidor",
-                                        LENGTH_LONG).show();
-                                //TODO
+
+                                alert("Error interna del servidor",0);
+
                             } else if (error instanceof NetworkError) {
-                                //TODO
-                                Toast.makeText(getApplicationContext(),
-                                        "error internet",
-                                        LENGTH_LONG).show();
+
+                                alert("Error de conexion",0);
                             } else if (error instanceof ParseError) {
-                                Toast.makeText(getApplicationContext(),
-                                        "error de parseo",
-                                        LENGTH_LONG).show();
+
+                                alert("Error de formato de datos",0);
                             }
                         }
                     });
+
             request.add(jsonObjectRequest);
 
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+
+    }
+    public void alert(String text, int type){
+        switch (type){
+            case 0:
+                new LGSnackbar.LGSnackbarBuilder(getApplicationContext(), text)
+                        .duration(3000)
+                        .actionTextColor(Color.RED)
+                        .backgroundColor(Color.RED)
+                        .minHeightDp(50)
+                        .textColor(Color.WHITE)
+                        .iconID(R.drawable.ic_custom_error)
+                        .callback(null)
+                        .action(null)
+                        .show();
+                break;
+            case 1:
+                new LGSnackbar.LGSnackbarBuilder(getApplicationContext(), text)
+                        .duration(3000)
+                        .actionTextColor(Color.RED)
+                        .backgroundColor(Color.RED)
+                        .minHeightDp(50)
+                        .textColor(Color.WHITE)
+                        .iconID(R.drawable.ic_custom_error)
+                        .callback(null)
+                        .action(null)
+                        .show();
+                break;
         }
 
     }

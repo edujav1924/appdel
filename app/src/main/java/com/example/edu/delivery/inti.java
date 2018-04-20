@@ -73,6 +73,7 @@ public class inti extends AppCompatActivity {
     private boolean mRequestingLocationUpdates = true;
     LocationManager manager;
     ImageView load;
+    private boolean band = false;
     Drawable drawable;
 
     @Override
@@ -218,13 +219,17 @@ public class inti extends AppCompatActivity {
         if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
             showAlert();
         }
-        else {
 
-        }
 
 
     }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        if(band)
+            stopLocationUpdates();
 
+    }
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(100);
@@ -233,16 +238,6 @@ public class inti extends AppCompatActivity {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
-            @Override
-            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                Log.e("entre","entre");
-                if (!locationSettingsResponse.getLocationSettingsStates().isGpsUsable()){
-                    Log.e("soy yo","1");
-
-                }
-            }
-        });
         task.addOnFailureListener(this, new OnFailureListener() {
             @RequiresApi(api = Build.VERSION_CODES.DONUT)
             @Override
@@ -265,6 +260,7 @@ public class inti extends AppCompatActivity {
 
     private void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        band = false;
     }
 
     private void startLocationUpdates() {
@@ -272,6 +268,7 @@ public class inti extends AppCompatActivity {
 
             return;
         }
+        band = true;
         mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                 mLocationCallback,
                 null );
@@ -285,8 +282,8 @@ public class inti extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.e("status","3");
+                    mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-                    getlocation();
                 }
                     else {
                     Log.e("status","4");
