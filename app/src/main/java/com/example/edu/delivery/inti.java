@@ -120,7 +120,7 @@ public class inti extends AppCompatActivity {
     private void onload() {
         drawable = load.getDrawable();
         if (drawable instanceof Animatable) {
-            Log.e("entre", "entre");
+            Log.e("entre", "onload");
             ((Animatable) drawable).start();
             load.setVisibility(View.VISIBLE);
         }
@@ -130,7 +130,7 @@ public class inti extends AppCompatActivity {
     private void offload() {
         drawable = load.getDrawable();
         if (drawable instanceof Animatable) {
-            Log.e("entre", "entre");
+            Log.e("entre", "offload");
             ((Animatable) drawable).stop();
 
         }

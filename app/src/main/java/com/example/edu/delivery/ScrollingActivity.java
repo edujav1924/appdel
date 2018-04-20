@@ -47,8 +47,8 @@ public class ScrollingActivity extends AppCompatActivity {
     ArrayList<String> precio_list_spinner = new ArrayList<>();
     private int id_seleccion;
     customadapterlist madapter;
-
-
+    JSONArray jsondata;
+    String position;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,10 +59,16 @@ public class ScrollingActivity extends AppCompatActivity {
         pedidos_seleccionados = findViewById(R.id.lista);
         total_text = findViewById(R.id.total);
         logo = findViewById(R.id.logo);
+        try {
+            jsondata = new JSONArray(getIntent().getExtras().getString("objeto"));
+            position = getIntent().getExtras().getString("posicion");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         toolbars();
         spinners();
         numberpickers();
-        Log.e("fg",getIntent().getExtras().getString("objeto"));
+
         Log.e("fg",getIntent().getExtras().getString("posicion"));
 
 
@@ -77,8 +83,6 @@ public class ScrollingActivity extends AppCompatActivity {
     }
     public void btn_agregar(View view){
         int canti = numberPicker.getValue();
-        Log.e("canti", String.valueOf(canti));
-        Log.e("canti", String.valueOf(id_seleccion));
         if (id_seleccion!=0 && canti!=0) {
 
             Integer precio = Integer.parseInt(precio_list_spinner.get(id_seleccion));
@@ -194,6 +198,16 @@ public class ScrollingActivity extends AppCompatActivity {
             return true;
         }
         if(id == R.id.action_send){
+            JSONObject customobj = new JSONObject();
+            try {
+                customobj.put("empresa",jsondata.getJSONObject(Integer.parseInt(position)).getString("empresa"));
+                customobj.put("ubicacion",
+                        "https://www.google.com/maps?q=" +
+                                getIntent().getExtras().getString("latitud")+","+getIntent().getExtras().getString("longitud"));
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             JSONArray jsonArr = new JSONArray();
             for(int i = 0;i<pedido_list.size();i++){
                 JSONObject pedidos = new JSONObject();
@@ -204,6 +218,14 @@ public class ScrollingActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 jsonArr.put(pedidos);
+            }
+            try {
+                customobj.put("pedidos",jsonArr);
+                Intent intent = new Intent(this,send.class);
+                intent.putExtra("datos", String.valueOf(customobj));
+                startActivity(intent);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
 
         }

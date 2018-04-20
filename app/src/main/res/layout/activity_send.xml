@@ -17,13 +17,24 @@
         app:layout_constraintTop_toTopOf="parent">
 
 
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/aclonica"
+            android:text="Complete estos campos"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
         <studio.carbonylgroup.textfieldboxes.TextFieldBoxes
             android:id="@+id/text_field_nombre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:labelText="Nombre"
+            app:minCharacters="3"
             app:maxCharacters="10"
-            app:errorColor="#ff0900"
+            app:errorColor="@color/errorcolor"
             app:helperTextColor="#d43800"
             app:primaryColor="#002fed"
             app:hasClearButton="true">
@@ -32,6 +43,7 @@
                 android:id="@+id/box_edit_nombre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxLength="10"
                 android:digits="abcdefghijklmnñopqrstuvwxyz"
                 />
 
@@ -41,18 +53,20 @@
             android:id="@+id/text_field_apellido"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:errorColor="#ff0900"
+            app:errorColor="@color/errorcolor"
+            app:hasClearButton="true"
             app:helperTextColor="#d43800"
-            app:primaryColor="#002fed"
             app:labelText="Apellido"
             app:maxCharacters="10"
-            app:hasClearButton="true">
+            app:minCharacters="3"
+            app:primaryColor="#002fed">
 
             <studio.carbonylgroup.textfieldboxes.ExtendedEditText
                 android:id="@+id/extended_edit_apellido"
-                android:digits="abcdefghijklmnñopqrstuvwxyz"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:digits="abcdefghijklmnñopqrstuvwxyz"
+                android:maxLength="10" />
 
         </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
         <studio.carbonylgroup.textfieldboxes.TextFieldBoxes
@@ -63,7 +77,7 @@
             app:maxCharacters="10"
             app:minCharacters="10"
             app:hasClearButton="true"
-            app:errorColor="#ff0900"
+            app:errorColor="@color/errorcolor"
             app:helperTextColor="#d43800"
             app:helperText="Ej:0981xxxxxx"
             app:primaryColor="#002fed">
@@ -73,8 +87,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
+                android:maxLength="10"
                 />
 
         </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
+
+        <Button
+            android:id="@+id/button_enviar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:enabled="false"
+            android:onClick="enviar"
+            android:text="Enviar pedido" />
     </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

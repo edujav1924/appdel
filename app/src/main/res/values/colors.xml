@@ -9,4 +9,5 @@
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="table">#00921b</color>
+    <color name="errorcolor">#649b00</color>
 </resources>
