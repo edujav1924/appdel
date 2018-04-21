@@ -1,14 +1,14 @@
 package com.example.edu.delivery;
 
-import android.content.Intent;
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -22,37 +22,30 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.desai.vatsal.mydynamictoast.MyDynamicToast;
 import com.example.circulardialog.CDialog;
 import com.example.circulardialog.extras.CDConstants;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Method;
-
-import greco.lorenzo.com.lgsnackbar.LGSnackbarManager;
 import greco.lorenzo.com.lgsnackbar.core.LGSnackbar;
-import greco.lorenzo.com.lgsnackbar.style.LGSnackBarStyle;
-import greco.lorenzo.com.lgsnackbar.style.LGSnackBarTheme;
 import studio.carbonylgroup.textfieldboxes.SimpleTextChangedWatcher;
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
-
-import static android.widget.Toast.LENGTH_LONG;
 
 public class send extends AppCompatActivity {
     private boolean aux_nombre=true;
     private boolean aux_apellido=true;
     private boolean aux_telefono=true;
     private JSONObject datos;
+    basedatos mDbHelper;
     String nombre_text,apellido_text,telefono_text;
     private  TextFieldBoxes nombre,apellido,telefono;
+    @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
-
+        View a = findViewById(R.id.box_edit_nombre);
         try {
             datos = new JSONObject(getIntent().getExtras().getString("datos"));
             Log.e("datos",datos.toString());
@@ -105,6 +98,8 @@ public class send extends AppCompatActivity {
             }
         });
     }
+
+
     public void verify(){
         if(!aux_apellido && !aux_nombre && !aux_telefono){
             findViewById(R.id.button_enviar).setEnabled(true);
@@ -163,7 +158,6 @@ public class send extends AppCompatActivity {
                                             .setTextSize(CDConstants.NORMAL_TEXT_SIZE)  // CDConstants.LARGE_TEXT_SIZE, CDConstants.NORMAL_TEXT_SIZE
                                             .show();
                                 }
-
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -200,6 +194,7 @@ public class send extends AppCompatActivity {
         }
 
     }
+
     public void alert(String text, int type){
         switch (type){
             case 0:
@@ -229,4 +224,7 @@ public class send extends AppCompatActivity {
         }
 
     }
+
+
+
 }

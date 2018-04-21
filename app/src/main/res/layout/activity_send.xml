@@ -45,9 +45,8 @@
                 android:id="@+id/box_edit_nombre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxLength="10"
                 android:digits="abcdefghijklmnñopqrstuvwxyz"
-                />
+                android:maxLength="10" />
 
         </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
 
@@ -96,6 +95,13 @@
                 />
 
         </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
+
+        <CheckBox
+            android:id="@+id/recordar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Recordar datos" />
 
         <Button
             android:id="@+id/button_enviar"
