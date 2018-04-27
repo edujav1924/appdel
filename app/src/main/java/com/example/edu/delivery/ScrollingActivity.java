@@ -31,7 +31,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import greco.lorenzo.com.lgsnackbar.core.LGSnackbar;
 
@@ -70,9 +73,6 @@ public class ScrollingActivity extends AppCompatActivity {
         toolbars();
         spinners();
         numberpickers();
-
-        Log.e("fg",getIntent().getExtras().getString("posicion"));
-
 
     }
     public void total(){
@@ -223,6 +223,9 @@ public class ScrollingActivity extends AppCompatActivity {
                     jsonArr.put(pedidos);
                 }
                 try {
+                    ArrayList<String> distancia = (ArrayList) getIntent().getExtras().getSerializable("distancias");
+                    Log.e("distancia", distancia.get(Integer.parseInt(position)));
+                    customobj.put("distancia",distancia.get(Integer.parseInt(position)));
                     customobj.put("pedidos",jsonArr);
                     Intent intent = new Intent(this,send.class);
                     intent.putExtra("datos", String.valueOf(customobj));

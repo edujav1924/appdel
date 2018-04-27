@@ -16,7 +16,8 @@ public class basedatos extends SQLiteOpenHelper {
             "CREATE TABLE " + FeedEntry.TABLE_NAME + " (" +
                     FeedEntry._ID + " INTEGER PRIMARY KEY," +
                     FeedEntry.COLUMN_NOMBRE + TEXT_TYPE + COMMA_SEP +
-                    FeedEntry.COLUMN_APELLIDO + TEXT_TYPE + " )";
+                    FeedEntry.COLUMN_APELLIDO + TEXT_TYPE + COMMA_SEP +
+                    FeedEntry.COLUMN_CELULAR + TEXT_TYPE +" )";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + FeedEntry.TABLE_NAME;
@@ -41,5 +42,6 @@ public class basedatos extends SQLiteOpenHelper {
         public static final String TABLE_NAME = "entry";
         public static final String COLUMN_NOMBRE = "nombre";
         public static final String COLUMN_APELLIDO = "apellido";
+        public static final String COLUMN_CELULAR = "celular";
     }
 }

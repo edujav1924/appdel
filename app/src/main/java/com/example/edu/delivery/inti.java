@@ -175,6 +175,7 @@ public class inti extends AppCompatActivity {
     }
 
     private void lastlocation() {
+        onload();
         Log.e("lastlocation","kasasa");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -200,7 +201,7 @@ public class inti extends AppCompatActivity {
                         }
                         else {
                             getlocation();
-                            onload();
+                            offload();
 
                         }
                     }
@@ -296,7 +297,7 @@ public class inti extends AppCompatActivity {
 
     private void getdata(final String latitudcel, final String longitudcel) {
         RequestQueue queue2 = Volley.newRequestQueue(this);
-        String url ="http://192.168.43.158:8000/empresa.json";
+        String url ="http://delivery.simplelectronica.com:8000/empresa.json";
         StringRequest stringRequest2 = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @RequiresApi(api = Build.VERSION_CODES.DONUT)

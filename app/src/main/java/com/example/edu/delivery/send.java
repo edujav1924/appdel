@@ -9,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -38,14 +41,29 @@ public class send extends AppCompatActivity {
     private boolean aux_telefono=true;
     private JSONObject datos;
     basedatos mDbHelper;
+    CheckBox remember;
+    int flag=-1;
     String nombre_text,apellido_text,telefono_text;
     private  TextFieldBoxes nombre,apellido,telefono;
+    EditText nombre_box,apellido_box,celular_box;
     @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
-        View a = findViewById(R.id.box_edit_nombre);
+        remember = findViewById(R.id.recordar);
+        nombre_box= findViewById(R.id.box_edit_nombre);
+        apellido_box = findViewById(R.id.box_edit_apellido);
+        celular_box = findViewById(R.id.box_edit_telefono);
+        mDbHelper= new basedatos(send.this);
+
+        try {
+            flag = leerinfo();
+            verify();
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(),"erroralleerinfo",Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
         try {
             datos = new JSONObject(getIntent().getExtras().getString("datos"));
             Log.e("datos",datos.toString());
@@ -112,15 +130,15 @@ public class send extends AppCompatActivity {
     public void enviar(View v){
         try {
 
-            datos.put("nombre",nombre_text);
-            datos.put("apellido",apellido_text);
-            datos.put("celular",telefono_text);
+            datos.put("nombre",nombre_box.getText().toString());
+            datos.put("apellido",apellido_box.getText().toString());
+            datos.put("celular",celular_box.getText().toString());
             Log.e("datos",datos.toString());
 
             RequestQueue request = Volley.newRequestQueue(this);
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.POST, "http://192.168.43.158:8000/cliente/",datos, new Response.Listener<JSONObject>() {
+                    (Request.Method.POST, "http://delivery.simplelectronica.com:8000/cliente/",datos, new Response.Listener<JSONObject>() {
 
                         @Override
                         public void onResponse(JSONObject response) {
@@ -148,6 +166,25 @@ public class send extends AppCompatActivity {
                                         }
                                     };
                                     thread.start();
+                                    if(remember.isChecked()){
+                                        Thread hilo = new Thread(){
+                                            @Override
+                                            public void run() {
+                                                try {
+                                                    if (flag==0){
+                                                        guardarinfo(nombre_text,apellido_text,telefono_text);
+                                                    }else if(flag>0){
+                                                        actualizar();
+                                                    }
+
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        };
+                                        hilo.start();
+                                    }
+
 
                                 }else {
                                     new CDialog(send.this).createAlert(valor,
@@ -194,7 +231,77 @@ public class send extends AppCompatActivity {
         }
 
     }
+    private void actualizar(){
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
+        ContentValues values = new ContentValues();
+        values.put(basedatos.FeedEntry.COLUMN_NOMBRE, nombre_box.getText().toString());
+        values.put(basedatos.FeedEntry.COLUMN_APELLIDO, apellido_box.getText().toString());
+        values.put(basedatos.FeedEntry.COLUMN_CELULAR ,celular_box.getText().toString());
+
+
+        String selection = basedatos.FeedEntry._ID +"=?";
+        String[] selectionArgs = { "1" };
+
+        int count = db.update(
+                basedatos.FeedEntry.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
+        db.close();
+    }
+
+    private int leerinfo() {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+// Define a projection that specifies which columns from the database
+// you will actually use after this query.
+        String[] projection = {
+                basedatos.FeedEntry._ID,
+                basedatos.FeedEntry.COLUMN_NOMBRE,
+                basedatos.FeedEntry.COLUMN_APELLIDO,
+                basedatos.FeedEntry.COLUMN_CELULAR
+        };
+        String selection = basedatos.FeedEntry._ID +"=?";
+        String[] selectionArgs = { "1" };
+
+        //Cursor c = db.rawQuery(" SELECT * FROM entry Where 'basedatos.FeedEntry._ID=0' ", null);
+        Cursor c = db.query(basedatos.FeedEntry.TABLE_NAME,projection,selection, selectionArgs,null,null,null);
+        c.moveToFirst();
+        if(c.getCount()>0){
+            Log.e("id", String.valueOf(c.getCount()));
+            Log.e("id",c.getString(1));
+            Log.e("id1",c.getString(2));
+            Log.e("id2",c.getString(3));
+            nombre_box.setText(c.getString(1));
+            apellido_box.setText(c.getString(2));
+            celular_box.setText(c.getString(3));
+            aux_telefono = false;
+            aux_nombre = false;
+            aux_apellido =false;
+
+
+        }
+        else{
+            Log.e("status", "vacio");
+        }
+        db.close();
+        return c.getCount();
+
+    }
+
+    private void guardarinfo(String nombre ,String apellido,String celular) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+// Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(basedatos.FeedEntry.COLUMN_NOMBRE, nombre);
+        values.put(basedatos.FeedEntry.COLUMN_APELLIDO, apellido);
+        values.put(basedatos.FeedEntry.COLUMN_CELULAR, celular);
+
+// Insert the new row, returning the primary key value of the new row
+        long newRowId = db.insert(basedatos.FeedEntry.TABLE_NAME, null, values);
+        db.close();
+    }
     public void alert(String text, int type){
         switch (type){
             case 0:

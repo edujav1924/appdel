@@ -17,6 +17,7 @@ import com.github.florent37.expansionpanel.viewgroup.ExpansionLayoutCollection;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,6 +116,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
                     intent.putExtra("objeto", String.valueOf(jsonarray));
                     intent.putExtra("latitud",lat);
                     intent.putExtra("longitud",lon);
+                    intent.putExtra("distancias", (Serializable) distancias);
                     intent.putExtra("posicion", String.valueOf(getAdapterPosition()));
                     context.startActivity(intent);
 
