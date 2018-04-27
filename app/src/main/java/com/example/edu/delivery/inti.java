@@ -75,6 +75,7 @@ public class inti extends AppCompatActivity {
     ImageView load;
     private boolean band = false;
     Drawable drawable;
+    Boolean flag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +91,7 @@ public class inti extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             Log.e("status", "0");
-
+            flag=true;
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -140,76 +141,90 @@ public class inti extends AppCompatActivity {
     }
 
     private void getlocation() {
-        Log.e("status", "1");
-        mLocationCallback = new LocationCallback() {
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !flag) {
+            showAlert();
+        }else {
+            Log.e("status", "1");
+            mLocationCallback = new LocationCallback() {
 
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    Log.e("loation", "null");
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if (locationResult == null) {
+                        Log.e("loation", "null");
 
-                }
-                for (Location location : locationResult.getLocations()) {
-                    String latitud = location.convert(location.getLatitude(), 0);
-                    String longitud = location.convert(location.getLongitude(), 0);
+                    }
+                    for (Location location : locationResult.getLocations()) {
+                        String latitud = location.convert(location.getLatitude(), 0);
+                        String longitud = location.convert(location.getLongitude(), 0);
 
-                    locationgps.setText(latitud + " " + longitud);
-                    locationnet.setText("aproximando a: "+String.valueOf(location.getAccuracy())+" metros");
-                    if (location.getAccuracy() <= 25.0) {
-                        Log.e("loation", String.valueOf(location.getAccuracy()));
-                        texto_init.setText("obteniendo datos ..");
-                        getdata(latitud, longitud);
-                        stopLocationUpdates();
+                        locationgps.setText(latitud + " " + longitud);
+                        locationnet.setText("aproximando a: " + String.valueOf(location.getAccuracy()) + " metros");
+                        if (location.getAccuracy() <= 25.0) {
+                            Log.e("loation", String.valueOf(location.getAccuracy()));
+                            texto_init.setText("obteniendo datos ..");
+                            getdata(latitud, longitud);
+                            stopLocationUpdates();
+                        }
                     }
                 }
-            }
 
-            ;
-        };
-        createLocationRequest();
-        startLocationUpdates();
-        texto_init.setText("obteniendo ubicacion");
-
+                ;
+            };
+            createLocationRequest();
+            startLocationUpdates();
+            texto_init.setText("obteniendo ubicacion");
+        }
 
     }
 
     private void lastlocation() {
-        onload();
-        Log.e("lastlocation","kasasa");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !flag) {
+            showAlert();
+        }else {
+            onload();
+            Log.e("lastlocation", "kasasa");
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                String latitud = location.convert(location.getLatitude(), 0);
+                                String longitud = location.convert(location.getLongitude(), 0);
+                                Log.e("lastlocation", String.valueOf(location));
+                                getdata(latitud, longitud);
+                            } else {
+                                getlocation();
+                                offload();
+
+                            }
+                        }
+                    });
         }
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            String latitud = location.convert(location.getLatitude(), 0);
-                            String longitud = location.convert(location.getLongitude(), 0);
-                            Log.e("lastlocation", String.valueOf(location));
-                            getdata(latitud, longitud);
-                        }
-                        else {
-                            getlocation();
-                            offload();
-
-                        }
-                    }
-                });
     }
     @Override
     public void onPause() {
         super.onPause();  // Always call the superclass method first
+        Log.e("onremis","pause");
+
+
+    }
+    @Override
+    public void onRestart() {
+        super.onRestart();  // Always call the superclass method first
+        Log.e("onremis","restar");
 
 
     }
@@ -217,7 +232,8 @@ public class inti extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
-        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+        Log.e("onremis","onresume");
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !flag) {
             showAlert();
         }
 
@@ -284,7 +300,7 @@ public class inti extends AppCompatActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.e("status","3");
                     mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
+                    flag=false;
                 }
                     else {
                     Log.e("status","4");
