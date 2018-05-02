@@ -27,6 +27,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.circulardialog.CDialog;
 import com.example.circulardialog.extras.CDConstants;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -129,7 +130,8 @@ public class send extends AppCompatActivity {
     }
     public void enviar(View v){
         try {
-
+            String token = FirebaseInstanceId.getInstance().getToken();
+            datos.put("token",token);
             datos.put("nombre",nombre_box.getText().toString());
             datos.put("apellido",apellido_box.getText().toString());
             datos.put("celular",celular_box.getText().toString());
@@ -138,7 +140,7 @@ public class send extends AppCompatActivity {
             RequestQueue request = Volley.newRequestQueue(this);
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.POST, "http://delivery.simplelectronica.com:8000/cliente/",datos, new Response.Listener<JSONObject>() {
+                    (Request.Method.POST, "https://192.168.43.158:8000/cliente/",datos, new Response.Listener<JSONObject>() {
 
                         @Override
                         public void onResponse(JSONObject response) {

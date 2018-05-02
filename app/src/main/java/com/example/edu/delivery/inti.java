@@ -32,6 +32,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -46,9 +47,14 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.medialablk.easygifview.EasyGifView;
 import com.shashank.sony.fancydialoglib.Animation;
 import com.shashank.sony.fancydialoglib.FancyAlertDialog;
@@ -60,8 +66,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class inti extends AppCompatActivity {
     private static final int REQUEST_CHECK_SETTINGS = 100;
@@ -157,6 +175,11 @@ public class inti extends AppCompatActivity {
                     for (Location location : locationResult.getLocations()) {
                         String latitud = location.convert(location.getLatitude(), 0);
                         String longitud = location.convert(location.getLongitude(), 0);
+                        Log.e("customlatitud", String.valueOf(latitud.indexOf(',')));
+                        if (latitud.indexOf(',')>=0){
+                            latitud = latitud.replace(',', '.');
+                            longitud = longitud.replace(',', '.');
+                        }
 
                         locationgps.setText(latitud + " " + longitud);
                         locationnet.setText("aproximando a: " + String.valueOf(location.getAccuracy()) + " metros");
@@ -179,40 +202,41 @@ public class inti extends AppCompatActivity {
     }
 
     private void lastlocation() {
-        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !flag) {
-            showAlert();
-        }else {
-            onload();
-            Log.e("lastlocation", "kasasa");
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
 
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                String latitud = location.convert(location.getLatitude(), 0);
-                                String longitud = location.convert(location.getLongitude(), 0);
-                                Log.e("lastlocation", String.valueOf(location));
-                                getdata(latitud, longitud);
-                            } else {
-                                getlocation();
-                                offload();
-
-                            }
-                        }
-                    });
+        onload();
+        Log.e("lastlocation","kasasa");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
         }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            String latitud = location.convert(location.getLatitude(), 0);
+                            String longitud = location.convert(location.getLongitude(), 0);
+                            if(latitud.indexOf(',')>0){
+                                latitud = latitud.replace(',', '.');
+                                longitud = longitud.replace(',', '.');
+                            }
+                            getdata(latitud, longitud);
+                        }
+                        else {
+                            getlocation();
+                            offload();
+
+                        }
+                    }
+                });
     }
     @Override
     public void onPause() {
@@ -310,10 +334,52 @@ public class inti extends AppCompatActivity {
             }
         }
     }
+    public void Disable_Certificate_Validation_Java_SSL_Connections() {
+
+// Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }
+        };
+
+        // Install the all-trusting trust manager
+        SSLContext sc = null;
+        try {
+            sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            Log.d("test_disable", "OK========");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+        // Create all-trusting host name verifier
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
+
+        // Install the all-trusting host verifier
+        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+    }
 
     private void getdata(final String latitudcel, final String longitudcel) {
+        Disable_Certificate_Validation_Java_SSL_Connections();
+
         RequestQueue queue2 = Volley.newRequestQueue(this);
-        String url ="http://delivery.simplelectronica.com:8000/empresa.json";
+        String url ="https://192.168.43.158:8000/empresa.json";
         StringRequest stringRequest2 = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @RequiresApi(api = Build.VERSION_CODES.DONUT)
@@ -346,7 +412,7 @@ public class inti extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.DONUT)
             @Override
             public void onErrorResponse(VolleyError error) {
-                errors("no fue posible establecer contacto con el servidor");
+                errors("error al conectar con el servidor");
                 offload();
             }
         });
@@ -389,6 +455,7 @@ public class inti extends AppCompatActivity {
                             texto_init.setText("Finalizado");
                             desarrollo(direcciones,distancias,tiempo,jsono,longitudcel,latitudcel);
                         } catch (JSONException e) {
+                            Log.e("error", String.valueOf(e));
                             e.printStackTrace();
                             offload();
                             texto_init.setText("Hubo un error al recibir datos de localizacion");

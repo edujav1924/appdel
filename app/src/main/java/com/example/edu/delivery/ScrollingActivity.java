@@ -203,7 +203,9 @@ public class ScrollingActivity extends AppCompatActivity {
             if(!pedido_list.isEmpty()){
                 JSONObject customobj = new JSONObject();
                 try {
+                    Log.e("postion empresA",String.valueOf(Integer.parseInt(position)+1));
                     customobj.put("empresa",jsondata.getJSONObject(Integer.parseInt(position)).getString("empresa"));
+                    customobj.put("empresa_id",Integer.parseInt(position)+1);
                     customobj.put("ubicacion",
                             "https://www.google.com/maps?q=" +
                                     getIntent().getExtras().getString("latitud")+","+getIntent().getExtras().getString("longitud"));
