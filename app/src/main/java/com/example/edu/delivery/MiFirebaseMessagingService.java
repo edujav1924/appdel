@@ -25,10 +25,9 @@ public class MiFirebaseMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "Mensaje recibido de: " + from);
         if (remoteMessage.getNotification() != null){
             NotificationManager notif=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-            CharSequence subject = "gola";
             Notification notify=new Notification.Builder
                     (getApplicationContext()).setContentTitle(remoteMessage.getNotification().getTitle()).setContentText(remoteMessage.getNotification().getBody()).
-                    setContentTitle(subject).setSmallIcon(R.drawable.ic_action_navigation_arrow_back).build();
+                    setContentTitle(remoteMessage.getNotification().getTitle()).setSmallIcon(R.drawable.logito).build();
 
             notify.flags |= Notification.FLAG_AUTO_CANCEL;
             notif.notify(0, notify);

@@ -103,6 +103,12 @@
             android:layout_marginTop="20dp"
             android:text="Recordar datos" />
 
+        <CheckBox
+            android:id="@+id/recubi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="recordar ubicacion" />
+
         <Button
             android:id="@+id/button_enviar"
             android:layout_width="match_parent"
@@ -111,6 +117,7 @@
             android:enabled="false"
             android:onClick="enviar"
             android:text="Enviar pedido" />
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

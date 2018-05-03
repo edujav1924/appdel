@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -42,7 +43,7 @@ public class send extends AppCompatActivity {
     private boolean aux_telefono=true;
     private JSONObject datos;
     basedatos mDbHelper;
-    CheckBox remember;
+    CheckBox remember,recubi;
     int flag=-1;
     String nombre_text,apellido_text,telefono_text;
     private  TextFieldBoxes nombre,apellido,telefono;
@@ -56,6 +57,7 @@ public class send extends AppCompatActivity {
         nombre_box= findViewById(R.id.box_edit_nombre);
         apellido_box = findViewById(R.id.box_edit_apellido);
         celular_box = findViewById(R.id.box_edit_telefono);
+        recubi = findViewById(R.id.recubi);
         mDbHelper= new basedatos(send.this);
 
         try {
@@ -67,7 +69,6 @@ public class send extends AppCompatActivity {
         }
         try {
             datos = new JSONObject(getIntent().getExtras().getString("datos"));
-            Log.e("datos",datos.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -135,18 +136,18 @@ public class send extends AppCompatActivity {
             datos.put("nombre",nombre_box.getText().toString());
             datos.put("apellido",apellido_box.getText().toString());
             datos.put("celular",celular_box.getText().toString());
-            Log.e("datos",datos.toString());
 
             RequestQueue request = Volley.newRequestQueue(this);
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.POST, "https://192.168.43.158:8000/cliente/",datos, new Response.Listener<JSONObject>() {
+                    (Request.Method.POST, "https://192.168.43.158:443/cliente/",datos, new Response.Listener<JSONObject>() {
 
                         @Override
                         public void onResponse(JSONObject response) {
                             try {
                                 JSONObject jsonObject = new JSONObject(response.toString());
                                 String valor = jsonObject.getString("status");
+                                Log.e("respnse",valor);
                                 if (valor.equals("exitoso")){
                                     new CDialog(send.this).createAlert(valor,
                                             CDConstants.SUCCESS,   // Type of dialog
@@ -168,13 +169,13 @@ public class send extends AppCompatActivity {
                                         }
                                     };
                                     thread.start();
-                                    if(remember.isChecked()){
+                                    if(remember.isChecked() || recubi.isChecked() ){
                                         Thread hilo = new Thread(){
                                             @Override
                                             public void run() {
                                                 try {
                                                     if (flag==0){
-                                                        guardarinfo(nombre_text,apellido_text,telefono_text);
+                                                        guardarinfo(nombre_text,apellido_text,telefono_text,remember.isChecked(),recubi.isChecked());
                                                     }else if(flag>0){
                                                         actualizar();
                                                     }
@@ -237,10 +238,20 @@ public class send extends AppCompatActivity {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(basedatos.FeedEntry.COLUMN_NOMBRE, nombre_box.getText().toString());
-        values.put(basedatos.FeedEntry.COLUMN_APELLIDO, apellido_box.getText().toString());
-        values.put(basedatos.FeedEntry.COLUMN_CELULAR ,celular_box.getText().toString());
+        if (remember.isChecked()){
+            values.put(basedatos.FeedEntry.COLUMN_NOMBRE, nombre_box.getText().toString());
+            values.put(basedatos.FeedEntry.COLUMN_APELLIDO, apellido_box.getText().toString());
+            values.put(basedatos.FeedEntry.COLUMN_CELULAR ,celular_box.getText().toString());
 
+        }
+        if(recubi.isChecked()){
+            try {
+                values.put(basedatos.FeedEntry.COLUMN_LONGITUD,datos.getString("longitud"));
+                values.put(basedatos.FeedEntry.COLUMN_LATITUD,datos.getString("latitud"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
         String selection = basedatos.FeedEntry._ID +"=?";
         String[] selectionArgs = { "1" };
@@ -261,7 +272,10 @@ public class send extends AppCompatActivity {
                 basedatos.FeedEntry._ID,
                 basedatos.FeedEntry.COLUMN_NOMBRE,
                 basedatos.FeedEntry.COLUMN_APELLIDO,
-                basedatos.FeedEntry.COLUMN_CELULAR
+                basedatos.FeedEntry.COLUMN_CELULAR,
+                basedatos.FeedEntry.COLUMN_LONGITUD,
+                basedatos.FeedEntry.COLUMN_LATITUD
+
         };
         String selection = basedatos.FeedEntry._ID +"=?";
         String[] selectionArgs = { "1" };
@@ -291,14 +305,30 @@ public class send extends AppCompatActivity {
 
     }
 
-    private void guardarinfo(String nombre ,String apellido,String celular) {
+    private void guardarinfo(String nombre, String apellido, String celular, boolean datchecked, boolean recubiChecked) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
 // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
-        values.put(basedatos.FeedEntry.COLUMN_NOMBRE, nombre);
-        values.put(basedatos.FeedEntry.COLUMN_APELLIDO, apellido);
-        values.put(basedatos.FeedEntry.COLUMN_CELULAR, celular);
+        if (datchecked) {
+            values.put(basedatos.FeedEntry.COLUMN_NOMBRE, nombre);
+            values.put(basedatos.FeedEntry.COLUMN_APELLIDO, apellido);
+            values.put(basedatos.FeedEntry.COLUMN_CELULAR, celular);
+        }
+
+        try {
+            if(recubiChecked){
+                values.put(basedatos.FeedEntry.COLUMN_LONGITUD,datos.getString("longitud"));
+                values.put(basedatos.FeedEntry.COLUMN_LATITUD,datos.getString("latitud"));
+            }else{
+                values.put(basedatos.FeedEntry.COLUMN_LONGITUD,"0");
+                values.put(basedatos.FeedEntry.COLUMN_LATITUD,"0");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
 
 // Insert the new row, returning the primary key value of the new row
         long newRowId = db.insert(basedatos.FeedEntry.TABLE_NAME, null, values);

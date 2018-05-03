@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
@@ -28,9 +30,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
@@ -85,7 +93,7 @@ public class inti extends AppCompatActivity {
     private static final int REQUEST_CHECK_SETTINGS = 100;
     private FusedLocationProviderClient mFusedLocationClient;
     LocationRequest mLocationRequest;
-    TextView texto_init, locationgps, locationnet;
+    TextView texto_init, locationnet;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 12;
     private LocationCallback mLocationCallback;
     private boolean mRequestingLocationUpdates = true;
@@ -99,11 +107,11 @@ public class inti extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inti);
+
         load = findViewById(R.id.loading);
         load.setVisibility(View.GONE);
         texto_init = findViewById(R.id.text_init);
         locationnet = findViewById(R.id.locationnet);
-        locationgps = findViewById(R.id.locationgps);
         manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -128,12 +136,41 @@ public class inti extends AppCompatActivity {
     public void nubication(View view) {
         getlocation();
         onload();
-        findViewById(R.id.lastu).setEnabled(false);
     }
 
     public void lubication(View view) {
-        findViewById(R.id.newu).setEnabled(false);
-        lastlocation();
+        basedatos mDbHelper = new basedatos(inti.this);
+        leerubicacion(mDbHelper);
+    }
+
+    private void leerubicacion(basedatos mDbHelper) {
+
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Log.e("database", String.valueOf(db));
+// Define a projection that specifies which columns from the database
+// you will actually use after this query.
+        String[] projection = {
+                basedatos.FeedEntry._ID,
+                basedatos.FeedEntry.COLUMN_LONGITUD,
+                basedatos.FeedEntry.COLUMN_LATITUD
+
+        };
+        String selection = basedatos.FeedEntry._ID +"=?";
+        String[] selectionArgs = { "1" };
+
+        //Cursor c = db.rawQuery(" SELECT * FROM entry Where 'basedatos.FeedEntry._ID=0' ", null);
+        Cursor c = db.query(basedatos.FeedEntry.TABLE_NAME,projection,selection, selectionArgs,null,null,null);
+        c.moveToFirst();
+        Log.e("count", String.valueOf(c.getCount()));
+        if(c.getCount()>0){
+            if(!c.getString(1).equals("0")){
+                //getdata(c.getString(0), c.getString(1));
+                Log.e("id1",c.getString(1) +" "+c.getString(2));
+                getdata(c.getString(2),c.getString(1));
+            }
+
+        }
+        db.close();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.DONUT)
@@ -181,7 +218,6 @@ public class inti extends AppCompatActivity {
                             longitud = longitud.replace(',', '.');
                         }
 
-                        locationgps.setText(latitud + " " + longitud);
                         locationnet.setText("aproximando a: " + String.valueOf(location.getAccuracy()) + " metros");
                         if (location.getAccuracy() <= 25.0) {
                             Log.e("loation", String.valueOf(location.getAccuracy()));
@@ -192,7 +228,7 @@ public class inti extends AppCompatActivity {
                     }
                 }
 
-                ;
+
             };
             createLocationRequest();
             startLocationUpdates();
@@ -201,43 +237,6 @@ public class inti extends AppCompatActivity {
 
     }
 
-    private void lastlocation() {
-
-        onload();
-        Log.e("lastlocation","kasasa");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            String latitud = location.convert(location.getLatitude(), 0);
-                            String longitud = location.convert(location.getLongitude(), 0);
-                            if(latitud.indexOf(',')>0){
-                                latitud = latitud.replace(',', '.');
-                                longitud = longitud.replace(',', '.');
-                            }
-                            getdata(latitud, longitud);
-                        }
-                        else {
-                            getlocation();
-                            offload();
-
-                        }
-                    }
-                });
-    }
     @Override
     public void onPause() {
         super.onPause();  // Always call the superclass method first
@@ -379,7 +378,7 @@ public class inti extends AppCompatActivity {
         Disable_Certificate_Validation_Java_SSL_Connections();
 
         RequestQueue queue2 = Volley.newRequestQueue(this);
-        String url ="https://192.168.43.158:8000/empresa.json";
+        String url ="https://192.168.43.158:443/empresa.json";
         StringRequest stringRequest2 = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @RequiresApi(api = Build.VERSION_CODES.DONUT)
@@ -412,7 +411,22 @@ public class inti extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.DONUT)
             @Override
             public void onErrorResponse(VolleyError error) {
-                errors("error al conectar con el servidor");
+                if (error instanceof TimeoutError || error instanceof NoConnectionError) {
+                   errors("Error al conectar con el servidor");
+                } else if (error instanceof AuthFailureError) {
+                    errors("Error de autenticacion");
+
+                } else if (error instanceof ServerError) {
+
+                    errors("Error interna del servidor");
+
+                } else if (error instanceof NetworkError) {
+
+                    errors("Error de conexion");
+                } else if (error instanceof ParseError) {
+
+                    errors("Error de formato de datos");
+                }
                 offload();
             }
         });

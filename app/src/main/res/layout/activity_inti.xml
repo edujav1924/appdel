@@ -16,14 +16,53 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="149dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/lastu"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_weight="1"
+                android:background="@color/colorPrimaryDark"
+                android:fontFamily="@font/abhaya_libre"
+                android:onClick="lubication"
+                android:padding="5dp"
+                android:text="Ultima ubicacion"
+                android:textAlignment="center"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/newu"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignTop="@+id/lastu"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimaryDark"
+                android:fontFamily="@font/abhaya_libre"
+                android:onClick="nubication"
+                android:padding="5dp"
+                android:text="Nueva ubicacion"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
         <ImageView
             android:id="@+id/imageView7"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
+            android:layout_height="100dp"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="39dp"
-            app:srcCompat="@drawable/delivery" />
+            android:layout_marginTop="20dp"
+            android:src="@drawable/prueba" />
 
         <TextView
             android:id="@+id/text_init"
@@ -37,22 +76,12 @@
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/locationgps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="182dp"
-            android:text="TextView" />
-
-        <TextView
             android:id="@+id/locationnet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="89dp"
-            android:text="TextView" />
+            android:layout_marginBottom="89dp" />
 
         <ImageView
             android:id="@+id/loading"
@@ -61,37 +90,6 @@
             android:layout_above="@+id/text_init"
             android:layout_centerHorizontal="true"
            android:src="@drawable/loading" />
-
-        <Button
-            android:id="@+id/lastu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="37dp"
-            android:layout_marginTop="199dp"
-            android:background="@color/colorPrimaryDark"
-            android:fontFamily="@font/abhaya_libre"
-            android:onClick="lubication"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="Ultima ubicacion"
-            android:textColor="@color/white" />
-
-        <Button
-            android:id="@+id/newu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@+id/lastu"
-            android:layout_marginEnd="42dp"
-            android:background="@color/colorPrimaryDark"
-            android:fontFamily="@font/abhaya_libre"
-            android:onClick="nubication"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="Nueva ubicacion"
-            android:textColor="@color/white" />
 
 
     </RelativeLayout>

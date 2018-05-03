@@ -52,7 +52,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     public void onBindViewHolder(RecyclerHolder holder, int position) {
         String text = "";
         try {
-            Log.e("pos", String.valueOf(jsonarray.getJSONObject(position).getString("latitud")));
             for (int j=0;j<jsonarray.getJSONObject(position).getJSONArray("productos").length();j++){
                 try {
                     text = text + String.valueOf(jsonarray.getJSONObject(position).getJSONArray("productos").getJSONObject(j).getString("producto")+"\n");
@@ -111,7 +110,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.e("ir a", String.valueOf(getAdapterPosition()));
                     Intent intent = new Intent(context,ScrollingActivity.class);
                     intent.putExtra("objeto", String.valueOf(jsonarray));
                     intent.putExtra("latitud",lat);

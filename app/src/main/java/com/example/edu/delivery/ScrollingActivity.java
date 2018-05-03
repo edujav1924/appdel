@@ -203,7 +203,8 @@ public class ScrollingActivity extends AppCompatActivity {
             if(!pedido_list.isEmpty()){
                 JSONObject customobj = new JSONObject();
                 try {
-                    Log.e("postion empresA",String.valueOf(Integer.parseInt(position)+1));
+                    customobj.put("latitud", getIntent().getExtras().getString("latitud"));
+                    customobj.put("longitud", getIntent().getExtras().getString("longitud"));
                     customobj.put("empresa",jsondata.getJSONObject(Integer.parseInt(position)).getString("empresa"));
                     customobj.put("empresa_id",Integer.parseInt(position)+1);
                     customobj.put("ubicacion",
@@ -226,7 +227,6 @@ public class ScrollingActivity extends AppCompatActivity {
                 }
                 try {
                     ArrayList<String> distancia = (ArrayList) getIntent().getExtras().getSerializable("distancias");
-                    Log.e("distancia", distancia.get(Integer.parseInt(position)));
                     customobj.put("distancia",distancia.get(Integer.parseInt(position)));
                     customobj.put("pedidos",jsonArr);
                     Intent intent = new Intent(this,send.class);
