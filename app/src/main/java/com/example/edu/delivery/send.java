@@ -140,7 +140,7 @@ public class send extends AppCompatActivity {
             RequestQueue request = Volley.newRequestQueue(this);
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.POST, "https://delivery.simplelectronica.com:443/cliente/",datos, new Response.Listener<JSONObject>() {
+                    (Request.Method.POST, "https://192.168.43.158:8000/cliente/",datos, new Response.Listener<JSONObject>() {
 
                         @Override
                         public void onResponse(JSONObject response) {

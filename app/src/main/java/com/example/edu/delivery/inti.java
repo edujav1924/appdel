@@ -41,6 +41,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.ybq.android.spinkit.style.DoubleBounce;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -78,7 +80,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public class inti extends AppCompatActivity {
+public class inti extends AppCompatActivity  {
     private FusedLocationProviderClient mFusedLocationClient;
     LocationRequest mLocationRequest;
     TextView texto_init, locationnet;
@@ -91,6 +93,7 @@ public class inti extends AppCompatActivity {
     View spin;
     Button last_ubication;
     private String base_latitud,base_longitud;
+    private boolean flag2=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,16 +127,33 @@ public class inti extends AppCompatActivity {
     }
 
     private void errors(String a) {
-        texto_init.setText(a);
-        locationnet.setVisibility(View.GONE);
+        locationnet.setText(a);
+        texto_init.setText("");
         spin.setVisibility(View.GONE);
 
     }
 
     public void nubication(View view) {
-        getlocation();
+        flag2 = true;
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !flag) {
+            showAlert();
+        }else {
+            getlocation();
+        }
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (flag2){
+            if(!manager.isProviderEnabled( LocationManager.GPS_PROVIDER)){
+                errors("Necesita activar su Gps");
 
+            }else {
+                getlocation();
+            }
+        }
+        flag2 = false;
+    }
     public void lubication(View view) {
         spin.setVisibility(View.VISIBLE);
         getdata(base_latitud,base_longitud);
@@ -173,6 +193,8 @@ public class inti extends AppCompatActivity {
 
 
     private void getlocation() {
+
+        locationnet.setText("");
         texto_inicio("Obteniendo localizacion");
         spin.setVisibility(View.VISIBLE);
 
@@ -182,7 +204,6 @@ public class inti extends AppCompatActivity {
             Log.e("status", "1");
             mLocationCallback = new LocationCallback() {
 
-                @SuppressLint("SetTextI18n")
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     if (locationResult == null) {
@@ -225,17 +246,7 @@ public class inti extends AppCompatActivity {
 
 
     }
-    @RequiresApi(api = Build.VERSION_CODES.DONUT)
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !flag) {
-            showAlert();
-        }
 
-
-
-    }
     @Override
     public void onDestroy(){
         super.onDestroy();
@@ -252,7 +263,6 @@ public class inti extends AppCompatActivity {
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
         task.addOnFailureListener(this, new OnFailureListener() {
-            @RequiresApi(api = Build.VERSION_CODES.DONUT)
 
             @Override
             public void onFailure(@NonNull Exception e) {
@@ -348,7 +358,7 @@ public class inti extends AppCompatActivity {
         texto_inicio("obteniendo datos");
         Disable_Certificate_Validation_Java_SSL_Connections();
         RequestQueue queue2 = Volley.newRequestQueue(this);
-        String url ="https://delivery.simplelectronica.com:443/empresa.json";
+        String url ="https://192.168.43.158:8000/empresa.json";
         StringRequest stringRequest2 = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @RequiresApi(api = Build.VERSION_CODES.DONUT)
@@ -437,13 +447,13 @@ public class inti extends AppCompatActivity {
                         } catch (JSONException e) {
                             Log.e("error", String.valueOf(e));
                             e.printStackTrace();
-                            texto_init.setText("Hubo un error al recibir datos de localizacion");
+                            errors("Hubo un error al recibir datos de localizacion");
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                texto_init.setText("no fue posible obtener datos de localizacion");
+                errors("no fue posible obtener datos de localizacion");
             }
         });
         queue.add(stringRequest);
@@ -492,5 +502,6 @@ public class inti extends AppCompatActivity {
 
 
     }
+
 }
 
