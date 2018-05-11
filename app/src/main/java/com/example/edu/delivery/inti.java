@@ -358,7 +358,7 @@ public class inti extends AppCompatActivity  {
         texto_inicio("obteniendo datos");
         Disable_Certificate_Validation_Java_SSL_Connections();
         RequestQueue queue2 = Volley.newRequestQueue(this);
-        String url ="https://192.168.43.158:8000/empresa.json";
+        String url ="https://delivery.simplelectronica.com/empresa.json";
         StringRequest stringRequest2 = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @RequiresApi(api = Build.VERSION_CODES.DONUT)
