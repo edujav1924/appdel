@@ -99,24 +99,19 @@ class customadapterlist extends BaseAdapter {
     }
 }
 
-class customadapterbusqueda extends BaseAdapter {
+class customadapterubicacion extends BaseAdapter {
     Context context;
-    private String[] comida;
-    private Integer[] bebida;
+    private String[] lugar;
     LayoutInflater inflter;
 
-    public customadapterbusqueda(Context applicationContext, ArrayList<String> comida, ArrayList<Integer> bebida) {
+    public customadapterubicacion(Context applicationContext, ArrayList<String> lugar) {
         this.context = applicationContext;
-        this.comida = comida.toArray(new String[0]);
-        this.bebida = bebida.toArray(new Integer[0]);
+        this.lugar = lugar.toArray(new String[0]);
         inflter = (LayoutInflater.from(applicationContext));
     }
     @Override
     public int getCount() {
-        if (comida.length>bebida.length){
-            return comida.length;
-        }
-        else return bebida.length;
+        return lugar.length;
     }
 
     @Override
@@ -131,15 +126,9 @@ class customadapterbusqueda extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        view = inflter.inflate(R.layout.customitemlist, null);
-        TextView comidaview = view.findViewById(R.id.busqueda_comida);
-        TextView bebidaview = view.findViewById(R.id.busqueda_bebida);
-        if (comida.length>=i) {
-            comidaview.setText(comida[i]);
-        }
-        if (bebida.length>=i){
-            bebidaview.setText(String.valueOf(bebida[i]));
-        }
+        view = inflter.inflate(R.layout.custom_spinner_ubicacion, null);
+        TextView ubicationview = view.findViewById(R.id.text_ubi);
+        ubicationview.setText(lugar[i]);
         return view;
     }
 }

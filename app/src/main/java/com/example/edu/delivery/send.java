@@ -48,7 +48,10 @@ public class send extends AppCompatActivity {
     String nombre_text,apellido_text,telefono_text;
     private  TextFieldBoxes nombre,apellido,telefono;
     EditText nombre_box,apellido_box,celular_box;
-    @SuppressLint("ResourceType")
+    private String ubicacion_text;
+    private boolean aux_ubicacion,resp_ubi;
+    private String lugar,id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +72,7 @@ public class send extends AppCompatActivity {
         }
         try {
             datos = new JSONObject(getIntent().getExtras().getString("datos"));
+            resp_ubi = leerubi();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -78,7 +82,7 @@ public class send extends AppCompatActivity {
             public void onTextChanged(String theNewText, boolean isError) {
                 nombre_text = theNewText;
               if (isError){
-                  nombre.setError("3 caracteres minimo",false);
+                  nombre.setError("3 caractéres mínimo",false);
                   aux_nombre = true;
               }
               else{
@@ -93,7 +97,7 @@ public class send extends AppCompatActivity {
             public void onTextChanged(String theNewText, boolean isError) {
                 apellido_text = theNewText;
                 if (isError){
-                    apellido.setError("3 caracteres minimo",false);
+                    apellido.setError("3 caractéres mínimo",false);
                     aux_apellido = true;
                 }
                 else{
@@ -108,7 +112,7 @@ public class send extends AppCompatActivity {
             public void onTextChanged(String theNewText, boolean isError) {
                 telefono_text = theNewText;
                 if (isError){
-                    telefono.setError("3 caracteres minimo",false);
+                    telefono.setError("3 caractéres mínimo",false);
                     aux_telefono = true;
                 }
                 else {
@@ -117,11 +121,26 @@ public class send extends AppCompatActivity {
                 verify();
             }
         });
+        final TextFieldBoxes ubicacion = findViewById(R.id.text_ubicacion);
+        ubicacion.setSimpleTextChangeWatcher(new SimpleTextChangedWatcher() {
+            @Override
+            public void onTextChanged(String theNewText, boolean isError) {
+                ubicacion_text = theNewText;
+                if (isError){
+                    ubicacion.setError("4 caracteres minimo",false);
+                    aux_ubicacion = true;
+                }
+                else {
+                    aux_ubicacion = false;
+                }
+                verify();
+            }
+        });
     }
 
 
     public void verify(){
-        if(!aux_apellido && !aux_nombre && !aux_telefono){
+        if(!aux_apellido && !aux_nombre && !aux_telefono && !aux_ubicacion){
             findViewById(R.id.button_enviar).setEnabled(true);
         }
         else {
@@ -169,26 +188,29 @@ public class send extends AppCompatActivity {
                                         }
                                     };
                                     thread.start();
-                                    if(remember.isChecked() || recubi.isChecked() ){
+                                    if(remember.isChecked() || recubi.isChecked()){
                                         Thread hilo = new Thread(){
                                             @Override
                                             public void run() {
                                                 try {
                                                     if (flag==0){
-                                                        guardarinfo(nombre_text,apellido_text,telefono_text,remember.isChecked(),recubi.isChecked());
+                                                        guardarinfo(nombre_text,apellido_text,telefono_text);
                                                     }else if(flag>0){
                                                         actualizar();
+                                                    }
+                                                    if(recubi.isChecked()){
+                                                        addubi();
                                                     }
 
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
                                                 }
                                             }
+
                                         };
                                         hilo.start();
+
                                     }
-
-
                                 }else {
                                     new CDialog(send.this).createAlert(valor,
                                             CDConstants.WARNING,   // Type of dialog
@@ -234,28 +256,87 @@ public class send extends AppCompatActivity {
         }
 
     }
+
+    private void addubi() {
+        Log.e("addubi","entre");
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        try {
+
+            EditText a = findViewById(R.id.box_edit_ubicacion);
+            values.put(basedatos.posicion.COLUMN_LUGAR, a.getText().toString());
+            values.put(basedatos.posicion.COLUMN_lUGAR_LONGITUD, datos.getString("longitud"));
+            values.put(basedatos.posicion.COLUMN_LUGAR_LATITUD, datos.getString("latitud"));
+            Log.i("resubi", String.valueOf(resp_ubi));
+            if (resp_ubi){
+                Log.e("lugar",lugar);
+                if (!lugar.equals(a.getText().toString())){
+                    String selection = basedatos.FeedEntry._ID +"=?";
+                    String[] selectionArgs = { id };
+                    int count = db.update(
+                            basedatos.posicion.TABLE_NAME,
+                            values,
+                            selection,
+                            selectionArgs);
+                    db.close();
+                }
+
+
+            }else {
+                Log.e("nuevo nombre",a.getText().toString());
+                long newRowId = db.insert(basedatos.posicion.TABLE_NAME, null, values);
+                db.close();
+            }
+
+        }
+         catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean leerubi() throws JSONException {
+        boolean flag = false;
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor,cursor_2 = null;
+        String sql ="SELECT "+basedatos.posicion._ID+","+basedatos.posicion.COLUMN_LUGAR_LATITUD+" FROM "
+                +basedatos.posicion.TABLE_NAME+" WHERE "+basedatos.posicion.COLUMN_LUGAR_LATITUD+
+                "="+datos.getString("latitud");
+        cursor= db.rawQuery(sql,null);
+        Log.e("c","Cursor Count : " + cursor.getCount());
+        sql ="SELECT "+basedatos.posicion._ID+","+basedatos.posicion.COLUMN_lUGAR_LONGITUD+","
+                +basedatos.posicion.COLUMN_LUGAR+" FROM "
+                +basedatos.posicion.TABLE_NAME+" WHERE "+basedatos.posicion.COLUMN_lUGAR_LONGITUD+
+                "="+datos.getString("longitud");
+        cursor_2= db.rawQuery(sql,null);
+        Log.e("c","Cursor_2 Count : " + cursor_2.getCount());
+        if(cursor.getCount()>0 && cursor_2.getCount()>0){
+            cursor.moveToFirst();
+            cursor_2.moveToFirst();
+            Log.e("ides",cursor.getString(0)+" "+cursor_2.getString(0));
+            if (cursor.getString(0).equals(cursor_2.getString(0)) && !cursor.getString(0).equals("0")){
+                EditText a = findViewById(R.id.box_edit_ubicacion);
+                a.setText(cursor_2.getString(2));
+                lugar = cursor_2.getString(2);
+                id = cursor_2.getString(0);
+                cursor.close();
+                flag  = true;
+            }
+        }else{
+            Log.e("no encontrado"," no encontrado");
+            cursor.close();
+        }
+        Log.e("flag es", String.valueOf(flag));
+        return flag;
+    }
+
     private void actualizar(){
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
         ContentValues values = new ContentValues();
-        if (remember.isChecked()){
-            values.put(basedatos.FeedEntry.COLUMN_NOMBRE, nombre_box.getText().toString());
-            values.put(basedatos.FeedEntry.COLUMN_APELLIDO, apellido_box.getText().toString());
-            values.put(basedatos.FeedEntry.COLUMN_CELULAR ,celular_box.getText().toString());
-
-        }
-        if(recubi.isChecked()){
-            try {
-                values.put(basedatos.FeedEntry.COLUMN_LONGITUD,datos.getString("longitud"));
-                values.put(basedatos.FeedEntry.COLUMN_LATITUD,datos.getString("latitud"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
+        values.put(basedatos.FeedEntry.COLUMN_NOMBRE, nombre_box.getText().toString());
+        values.put(basedatos.FeedEntry.COLUMN_APELLIDO, apellido_box.getText().toString());
+        values.put(basedatos.FeedEntry.COLUMN_CELULAR ,celular_box.getText().toString());
         String selection = basedatos.FeedEntry._ID +"=?";
         String[] selectionArgs = { "1" };
-
         int count = db.update(
                 basedatos.FeedEntry.TABLE_NAME,
                 values,
@@ -273,8 +354,7 @@ public class send extends AppCompatActivity {
                 basedatos.FeedEntry.COLUMN_NOMBRE,
                 basedatos.FeedEntry.COLUMN_APELLIDO,
                 basedatos.FeedEntry.COLUMN_CELULAR,
-                basedatos.FeedEntry.COLUMN_LONGITUD,
-                basedatos.FeedEntry.COLUMN_LATITUD
+
 
         };
         String selection = basedatos.FeedEntry._ID +"=?";
@@ -305,34 +385,20 @@ public class send extends AppCompatActivity {
 
     }
 
-    private void guardarinfo(String nombre, String apellido, String celular, boolean datchecked, boolean recubiChecked) {
+    private void guardarinfo(String nombre, String apellido, String celular) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
 // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
-        if (datchecked) {
-            values.put(basedatos.FeedEntry.COLUMN_NOMBRE, nombre);
-            values.put(basedatos.FeedEntry.COLUMN_APELLIDO, apellido);
-            values.put(basedatos.FeedEntry.COLUMN_CELULAR, celular);
-        }
-
-        try {
-            if(recubiChecked){
-                values.put(basedatos.FeedEntry.COLUMN_LONGITUD,datos.getString("longitud"));
-                values.put(basedatos.FeedEntry.COLUMN_LATITUD,datos.getString("latitud"));
-            }else{
-                values.put(basedatos.FeedEntry.COLUMN_LONGITUD,"0");
-                values.put(basedatos.FeedEntry.COLUMN_LATITUD,"0");
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+        values.put(basedatos.FeedEntry.COLUMN_NOMBRE, nombre);
+        values.put(basedatos.FeedEntry.COLUMN_APELLIDO, apellido);
+        values.put(basedatos.FeedEntry.COLUMN_CELULAR, celular);
 
 
 // Insert the new row, returning the primary key value of the new row
         long newRowId = db.insert(basedatos.FeedEntry.TABLE_NAME, null, values);
         db.close();
+
     }
     public void alert(String text, int type){
         switch (type){

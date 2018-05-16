@@ -1,8 +1,10 @@
 package com.example.edu.delivery;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -15,7 +17,6 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -23,11 +24,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
@@ -40,9 +43,6 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.github.ybq.android.spinkit.style.DoubleBounce;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -65,8 +65,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -94,6 +92,7 @@ public class inti extends AppCompatActivity  {
     Button last_ubication;
     private String base_latitud,base_longitud;
     private boolean flag2=false;
+    private int id = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,26 +103,52 @@ public class inti extends AppCompatActivity  {
         texto_init = findViewById(R.id.text_init);
         locationnet = findViewById(R.id.locationnet);
         last_ubication = findViewById(R.id.lastu);
-        last_ubication.setVisibility(View.GONE);
-        Log.e("leleef","df");
         manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            Log.e("status", "0");
             flag=true;
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         } else {
             Log.e("status", "0");
+            if(respuesta_term()){
+                basedatos mDbHelper = new basedatos(inti.this);
+                obtener_ubicaciones(mDbHelper);
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            }else {
+                alert_term();
+            }
 
-            basedatos mDbHelper = new basedatos(inti.this);
-            Log.e("leerubicatiob","si");
-            leerubicacion(mDbHelper);
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         }
 
+    }
+
+    private boolean respuesta_term() {
+        boolean bandera = false;
+        basedatos mDbHelper = new basedatos(inti.this);
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+// Define a projection that specifies which columns from the database
+// you will actually use after this query.
+        String[] projection = {
+                basedatos.info._ID,
+                basedatos.info.COLUMN_CHECK,
+        };
+        String selection = basedatos.info._ID +"=?";
+        String[] selectionArgs = { "1" };
+
+        Cursor c = db.query(basedatos.info.TABLE_NAME,projection,selection, selectionArgs,null,null,null);
+        c.moveToFirst();
+        Log.e("valor de C", String.valueOf(c.getCount()));
+        if(c.getCount()>0){
+            if(c.getString(1).equals("1")){
+                bandera = true;
+            }
+            c.close();
+        }
+        db.close();
+        return bandera;
     }
 
     private void errors(String a) {
@@ -134,7 +159,8 @@ public class inti extends AppCompatActivity  {
     }
 
     public void nubication(View view) {
-        flag2 = true;
+
+       flag2 = true;
         if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) && !flag) {
             showAlert();
         }else {
@@ -156,10 +182,44 @@ public class inti extends AppCompatActivity  {
     }
     public void lubication(View view) {
         spin.setVisibility(View.VISIBLE);
+        basedatos mDbHelper = new basedatos(inti.this);
+        leerubicacion(mDbHelper);
         getdata(base_latitud,base_longitud);
     }
     private void texto_inicio(String texto){
         texto_init.setText(texto);
+    }
+    private void obtener_ubicaciones(basedatos mDbHelper){
+        ArrayList<String> list_ubi = new ArrayList<>();
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = null;
+        String sql ="SELECT "+basedatos.posicion.COLUMN_LUGAR+" FROM " +basedatos.posicion.TABLE_NAME;
+        cursor = db.rawQuery(sql,null);
+        if (cursor.moveToFirst()){
+            do {
+                list_ubi.add(cursor.getString(0));
+            }while (cursor.moveToNext());
+        }
+        Spinner ubicaciones = findViewById(R.id.spinner_ubi);
+        if (!list_ubi.isEmpty()){
+            ubicaciones.setVisibility(View.VISIBLE);
+            last_ubication.setVisibility(View.VISIBLE);
+            customadapterubicacion customubi = new customadapterubicacion(this,list_ubi);
+
+            ubicaciones.setAdapter(customubi);
+            ubicaciones.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    id = adapterView.getSelectedItemPosition();
+                    Log.e("el id es", String.valueOf(id));
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
+        }
     }
     private void leerubicacion(basedatos mDbHelper) {
 
@@ -167,27 +227,33 @@ public class inti extends AppCompatActivity  {
 // Define a projection that specifies which columns from the database
 // you will actually use after this query.
         String[] projection = {
-                basedatos.FeedEntry._ID,
-                basedatos.FeedEntry.COLUMN_LONGITUD,
-                basedatos.FeedEntry.COLUMN_LATITUD
+                basedatos.posicion._ID,
+                basedatos.posicion.COLUMN_LUGAR,
+                basedatos.posicion.COLUMN_lUGAR_LONGITUD,
+                basedatos.posicion.COLUMN_LUGAR_LATITUD,
 
         };
-        String selection = basedatos.FeedEntry._ID +"=?";
-        String[] selectionArgs = { "1" };
+        String selection = basedatos.posicion._ID +"=?";
+        String[] selectionArgs = { String.valueOf(id+1) };
 
-        Cursor c = db.query(basedatos.FeedEntry.TABLE_NAME,projection,selection, selectionArgs,null,null,null);
+        Cursor c = db.query(basedatos.posicion.TABLE_NAME,projection,selection, selectionArgs,null,null,null);
         c.moveToFirst();
         Log.e("valor de C", String.valueOf(c.getCount()));
         if(c.getCount()>0){
             if(!c.getString(1).equals("0")){
-                base_latitud = c.getString(2);
-                base_longitud = c.getString(1);
+                base_latitud = c.getString(3);
+                base_longitud = c.getString(2);
+                Log.e("location",c.getString(0)+" "+c.getString(1)+" "+c.getString(2)+" "+c.getString(3));
                 //getdata(c.getString(2),c.getString(1));
-                last_ubication.setVisibility(View.VISIBLE);
+
             }
+            c.close();
+
+
         }else {
             Log.e("aca","aca");
         }
+
         db.close();
     }
 
@@ -296,7 +362,6 @@ public class inti extends AppCompatActivity  {
                 mLocationCallback,
                 null );
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -304,8 +369,10 @@ public class inti extends AppCompatActivity  {
             case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    alert_term();
+                    /*obtener_ubicaciones(mDbHelper);
                     mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                    flag=false;
+                    flag=false;*/
                 }
                     else {
                     finish();
@@ -480,7 +547,7 @@ public class inti extends AppCompatActivity  {
                 .setMessage("Para poder brindarle la mejor atencion necesitamos que active su GPS")
                 .setNegativeBtnText("Salir")
                 .setPositiveBtnBackground(Color.parseColor("#009933"))  //Don't pass R.color.colorvalue
-                .setPositiveBtnText("Configuracion")
+                .setPositiveBtnText("GPS")
                 .setNegativeBtnBackground(Color.parseColor("#FFA9A7A8"))  //Don't pass R.color.colorvalue
                 .setAnimation(Animation.SLIDE)
                 .isCancellable(true)
@@ -499,9 +566,49 @@ public class inti extends AppCompatActivity  {
                     }
                 })
                 .build();
-
-
     }
+    private void alert_term(){
+        boolean wrapInScrollView = true;
+        new MaterialDialog.Builder(this)
+                .title("Informacion Importante")
+                .customView(R.layout.forma_de_uso, false)
+                .positiveText("acepto")
+                .negativeText("Rechazo")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                        basedatos bd = new basedatos(inti.this);
+                        SQLiteDatabase db = bd.getWritableDatabase();
+                        ContentValues values = new ContentValues();
+                        values.put(basedatos.info.COLUMN_CHECK, String.valueOf(1));
+                        long newRowId = db.insert(basedatos.info.TABLE_NAME, null, values);
+                        db.close();
+                        basedatos mDbHelper = new basedatos(inti.this);
+                        obtener_ubicaciones(mDbHelper);
+                        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(inti.this);
+                        flag=false;
+                        Log.e("terminos","acepto");
+
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                        basedatos bd = new basedatos(inti.this);
+                        SQLiteDatabase db = bd.getWritableDatabase();
+                        ContentValues values = new ContentValues();
+                        values.put(basedatos.info.COLUMN_CHECK, String.valueOf(0));
+                        long newRowId = db.insert(basedatos.info.TABLE_NAME, null, values);
+                        db.close();
+                        Log.e("terminos","rechazo");
+                        finish();
+
+                    }
+                })
+                .show();
+                
+    }
+
 
 }
 

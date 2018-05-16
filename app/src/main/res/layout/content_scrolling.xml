@@ -14,223 +14,213 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout"
+        <LinearLayout
+            android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@color/button_pressed"
+                android:contentDescription="TODO"
+                app:srcCompat="@drawable/delivery" />
 
             <LinearLayout
-                android:id="@+id/linearLayout2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/logo"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:background="@color/button_pressed"
-                    app:srcCompat="@drawable/delivery" android:contentDescription="TODO"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/text_producto"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/text_producto"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="cursive"
-                        android:text="Producto:"
-                        android:textAlignment="center"
-                        android:textAllCaps="false"
-                        android:textColor="@android:color/holo_red_dark"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:typeface="monospace" />
-
-                    <TextView
-                        android:id="@+id/text_cantidad"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="cursive"
-                        android:text="Cantidad:"
-                        android:textAlignment="center"
-                        android:textColor="@android:color/holo_red_dark"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:typeface="monospace" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="70dp"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center_vertical|center"
-                    android:orientation="horizontal">
-
-                    <Spinner
-                        android:id="@+id/categoria"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:backgroundTintMode="add"
-                        android:descendantFocusability="blocksDescendants"
-                        android:dropDownWidth="match_parent"
-                        android:spinnerMode="dialog" />
-
-                    <com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker
-                        android:id="@+id/number"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:snp_buttonBackgroundTintSelector="@android:color/holo_red_dark"
-                        app:snp_buttonPaddingLeft="30dp"
-                        app:snp_buttonPaddingRight="30dp"
-                        app:snp_maxValue="10"
-                        app:snp_minValue="0"
-                        app:snp_scrollEnabled="true"
-                        app:snp_stepSize="1"
-                        app:snp_value_text_color="@android:color/holo_red_dark"
-                        app:snp_value_text_size="24sp" />
-
-                </LinearLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp">
-
-                    <Button
-                        android:id="@+id/button2"
-                        android:layout_width="130dp"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true"
-                        android:layout_centerHorizontal="true"
-                        android:background="@drawable/button_background"
-                        android:drawableStart="@android:drawable/ic_input_add"
-                        android:fontFamily="@font/almendra"
-                        android:onClick="btn_agregar"
-                        android:text="Agregar"
-                        android:textAlignment="center"
-                        android:textAllCaps="false"
-                        android:textColor="@drawable/button_background"
-                        android:textSize="18sp" />
-
-                </RelativeLayout>
-
-                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:tools="http://schemas.android.com/tools"
-                    android:id="@+id/linearLayout3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:background="@drawable/customborderright"
-                    android:gravity="center_vertical|center_horizontal|center"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/almendra"
-                        android:gravity="center"
-                        android:text="Producto"
-                        android:textAlignment="center"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/almendra"
-                        android:gravity="center"
-                        android:text="Cantidad"
-                        android:textAlignment="center"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/almendra"
-                        android:gravity="center"
-                        android:text="Precio"
-                        android:textSize="18sp" />
-
-                </LinearLayout>
-
-                <RelativeLayout
-                    android:id="@+id/milayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
                     android:layout_weight="1"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+                    android:fontFamily="cursive"
+                    android:text="Producto:"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:typeface="monospace" />
 
-                    <ListView
-                        android:id="@+id/lista"
-                        style="@style/Widget.AppCompat.ListView.Menu"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentTop="true"
-                        android:divider="@color/table"
-                        android:dividerHeight="2dp"
-                        android:footerDividersEnabled="false"
-                        android:headerDividersEnabled="false"
-                        android:scrollbars="vertical" />
-                </RelativeLayout>
+                <TextView
+                    android:id="@+id/text_cantidad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="cursive"
+                    android:text="Cantidad:"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:typeface="monospace" />
+            </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@android:color/darker_gray"
-                    android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical|center"
+                android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/textView2"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@color/button_default"
-                        android:fontFamily="@font/almendra"
-                        android:gravity="center"
-                        android:text="Precio Total:"
-                        android:textAlignment="center"
-                        android:textColor="@color/white"
-                        android:textSize="18sp" />
+                <Spinner
+                    android:id="@+id/categoria"
+                    android:layout_width="335dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:dropDownWidth="match_parent"
+                    android:spinnerMode="dialog" />
 
-                    <TextView
-                        android:id="@+id/total"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:background="@color/colorPrimary"
-                        android:gravity="center"
-                        android:text="0"
-                        android:textAlignment="center"
-                        android:textColor="@color/white"
-                        android:textSize="18sp" />
-
-
-                </LinearLayout>
+                <com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker
+                    android:id="@+id/number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:snp_buttonIconLeft="@drawable/ic_indeterminate"
+                    app:snp_buttonIconRight="@drawable/ic_add_box"
+                    app:snp_buttonBackgroundTintSelector="@color/background_material_dark"
+                    app:snp_buttonPaddingLeft="30dp"
+                    app:snp_buttonPaddingRight="30dp"
+                    app:snp_maxValue="20"
+                    app:snp_minValue="0"
+                    app:snp_scrollEnabled="true"
+                    app:snp_stepSize="1"
+                    app:snp_value_text_color="@android:color/holo_red_dark"
+                    app:snp_value_text_size="24sp" />
 
             </LinearLayout>
 
-        </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/button2"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:background="@color/button_default"
+                    android:fontFamily="@font/almendra"
+                    android:onClick="btn_agregar"
+                    android:text="Agregar"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/background_light"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/linearLayout3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/customborderright"
+                android:gravity="center_vertical|center_horizontal|center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/almendra"
+                    android:gravity="center"
+                    android:text="Producto"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/almendra"
+                    android:gravity="center"
+                    android:text="Cantidad"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/almendra"
+                    android:gravity="center"
+                    android:text="Precio"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/milayout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+                <ListView
+                    android:id="@+id/lista"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:divider="@color/table"
+                    android:dividerHeight="2dp"
+                    android:footerDividersEnabled="false"
+                    android:headerDividersEnabled="false"
+                    android:scrollbars="vertical" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/darker_gray"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/button_default"
+                    android:fontFamily="@font/almendra"
+                    android:gravity="center"
+                    android:text="Precio Total:"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/total"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimary"
+                    android:fontFamily="@font/almendra"
+                    android:gravity="center"
+                    android:text="0"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="24sp" />
+
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 
