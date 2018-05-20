@@ -1,17 +1,31 @@
 package com.example.edu.delivery;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.SystemClock;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -33,6 +47,10 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
 import greco.lorenzo.com.lgsnackbar.core.LGSnackbar;
 import studio.carbonylgroup.textfieldboxes.SimpleTextChangedWatcher;
 import studio.carbonylgroup.textfieldboxes.TextFieldBoxes;
@@ -50,8 +68,11 @@ public class send extends AppCompatActivity {
     EditText nombre_box,apellido_box,celular_box;
     private String ubicacion_text;
     private boolean aux_ubicacion,resp_ubi;
-    private String lugar,id;
-
+    private boolean aux_fecha=false,aux_hora=false;
+    private String lugar,id,fecha_sel="",hora_sel="";
+    int myear,mmonth,mday,day_select,month_select,year_select,hour_select,minute_select;
+    int mhour,mminute;
+    Button send;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,108 +176,130 @@ public class send extends AppCompatActivity {
             datos.put("nombre",nombre_box.getText().toString());
             datos.put("apellido",apellido_box.getText().toString());
             datos.put("celular",celular_box.getText().toString());
+            RadioButton a = findViewById(R.id.delivery);
+            if (a.isChecked()){
+                datos.put("tipo","delivery");
+                datos.put("hora_sel","");
+                datos.put("fecha_sel","");
+                enviar();
+            }
+            else {
+                if (!hora_sel.equals("") && !fecha_sel.equals("")){
+                    datos.put("tipo","pasa_a_buscar");
 
-            RequestQueue request = Volley.newRequestQueue(this);
+                    task tarea = new task();
+                    tarea.execute(mday,mmonth,myear,day_select,month_select,year_select,hour_select,minute_select,mhour,mminute);
+                }
+                else {
+                    alert("falta hora y/o fecha en 'pasar a buscar' ",0);
+                }
 
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.POST, "https://delivery.simplelectronica.com/cliente/",datos, new Response.Listener<JSONObject>() {
-
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                JSONObject jsonObject = new JSONObject(response.toString());
-                                String valor = jsonObject.getString("status");
-                                Log.e("respnse",valor);
-                                if (valor.equals("exitoso")){
-                                    new CDialog(send.this).createAlert(valor,
-                                            CDConstants.SUCCESS,   // Type of dialog
-                                            CDConstants.LARGE)    //  size of dialog
-                                            .setAnimation(CDConstants.SCALE_FROM_RIGHT_TO_LEFT)     //  Animation for enter/exit
-                                            .setDuration(3000)   // in milliseconds
-                                            .setTextSize(CDConstants.NORMAL_TEXT_SIZE)  // CDConstants.LARGE_TEXT_SIZE, CDConstants.NORMAL_TEXT_SIZE
-                                            .show();
-                                    Thread thread = new Thread(){
-                                        @Override
-                                        public void run() {
-                                            try {
-                                                Thread.sleep(3500); // As I am using LENGTH_LONG in Toast
-                                                send.this.finish();
-
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    };
-                                    thread.start();
-                                    if(remember.isChecked() || recubi.isChecked()){
-                                        Thread hilo = new Thread(){
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    if (flag==0){
-                                                        guardarinfo(nombre_text,apellido_text,telefono_text);
-                                                    }else if(flag>0){
-                                                        actualizar();
-                                                    }
-                                                    if(recubi.isChecked()){
-                                                        addubi();
-                                                    }
-
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-
-                                        };
-                                        hilo.start();
-
-                                    }
-                                }else {
-                                    new CDialog(send.this).createAlert(valor,
-                                            CDConstants.WARNING,   // Type of dialog
-                                            CDConstants.LARGE)    //  size of dialog
-                                            .setAnimation(CDConstants.SCALE_FROM_RIGHT_TO_LEFT)     //  Animation for enter/exit
-                                            .setDuration(5000)   // in milliseconds
-                                            .setTextSize(CDConstants.NORMAL_TEXT_SIZE)  // CDConstants.LARGE_TEXT_SIZE, CDConstants.NORMAL_TEXT_SIZE
-                                            .show();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                    }, new Response.ErrorListener() {
-
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-
-                            if (error instanceof TimeoutError || error instanceof NoConnectionError) {
-                                alert("Error al conectar con el servidor",0);
-                            } else if (error instanceof AuthFailureError) {
-                                alert("Error de autenticacion",0);
-
-                            } else if (error instanceof ServerError) {
-
-                                alert("Error interna del servidor",0);
-
-                            } else if (error instanceof NetworkError) {
-
-                                alert("Error de conexion",0);
-                            } else if (error instanceof ParseError) {
-
-                                alert("Error de formato de datos",0);
-                            }
-                        }
-                    });
-
-            request.add(jsonObjectRequest);
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
+            alert("Error de envio",0);
         }
 
     }
+    private void enviar(){
+        Log.e("dato", String.valueOf(datos));
+        RequestQueue request = Volley.newRequestQueue(this);
 
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, "https://delivery.simplelectronica.com/cliente/",datos, new Response.Listener<JSONObject>()
+        {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response.toString());
+                    String valor = jsonObject.getString("status");
+                    Log.e("respnse",valor);
+                    if (valor.equals("exitoso")){
+                        new CDialog(send.this).createAlert(valor,
+                                CDConstants.SUCCESS,   // Type of dialog
+                                CDConstants.LARGE)    //  size of dialog
+                                .setAnimation(CDConstants.SCALE_FROM_RIGHT_TO_LEFT)     //  Animation for enter/exit
+                                .setDuration(3000)   // in milliseconds
+                                .setTextSize(CDConstants.NORMAL_TEXT_SIZE)  // CDConstants.LARGE_TEXT_SIZE, CDConstants.NORMAL_TEXT_SIZE
+                                .show();
+                        Thread thread = new Thread(){
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(3500); // As I am using LENGTH_LONG in Toast
+                                    send.this.finish();
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        };
+                        thread.start();
+                        if(remember.isChecked() || recubi.isChecked()){
+                            Thread hilo = new Thread(){
+                                @Override
+                                public void run() {
+                                    try {
+                                        if (remember.isChecked() && flag==0){
+                                            guardarinfo(nombre_text,apellido_text,telefono_text);
+                                        }else if(remember.isChecked() && flag>0){
+                                            actualizar();
+                                        }
+                                        if(recubi.isChecked()){
+                                            addubi();
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                            };
+                            hilo.start();
+
+                        }
+                    }else {
+                        new CDialog(send.this).createAlert(valor,
+                                CDConstants.WARNING,   // Type of dialog
+                                CDConstants.LARGE)    //  size of dialog
+                                .setAnimation(CDConstants.SCALE_FROM_RIGHT_TO_LEFT)     //  Animation for enter/exit
+                                .setDuration(3000)   // in milliseconds
+                                .setTextSize(CDConstants.NORMAL_TEXT_SIZE)  // CDConstants.LARGE_TEXT_SIZE, CDConstants.NORMAL_TEXT_SIZE
+                                .show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    alert("error al enviar pedido",0);
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                if (error instanceof TimeoutError || error instanceof NoConnectionError) {
+                    alert("Error al conectar con el servidor",0);
+                } else if (error instanceof AuthFailureError) {
+                    alert("Error de autenticacion",0);
+
+                } else if (error instanceof ServerError) {
+
+                    alert("Error interna del servidor",0);
+
+                } else if (error instanceof NetworkError) {
+
+                    alert("Error de conexion",0);
+                } else if (error instanceof ParseError) {
+
+                    alert("Error de formato de datos",0);
+                }
+            }
+        });
+
+        request.add(jsonObjectRequest);
+
+    }
     private void addubi() {
         Log.e("addubi","entre");
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -354,12 +397,9 @@ public class send extends AppCompatActivity {
                 basedatos.FeedEntry.COLUMN_NOMBRE,
                 basedatos.FeedEntry.COLUMN_APELLIDO,
                 basedatos.FeedEntry.COLUMN_CELULAR,
-
-
         };
         String selection = basedatos.FeedEntry._ID +"=?";
         String[] selectionArgs = { "1" };
-
         //Cursor c = db.rawQuery(" SELECT * FROM entry Where 'basedatos.FeedEntry._ID=0' ", null);
         Cursor c = db.query(basedatos.FeedEntry.TABLE_NAME,projection,selection, selectionArgs,null,null,null);
         c.moveToFirst();
@@ -374,17 +414,13 @@ public class send extends AppCompatActivity {
             aux_telefono = false;
             aux_nombre = false;
             aux_apellido =false;
-
-
         }
         else{
             Log.e("status", "vacio");
         }
         db.close();
         return c.getCount();
-
     }
-
     private void guardarinfo(String nombre, String apellido, String celular) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
@@ -417,11 +453,11 @@ public class send extends AppCompatActivity {
             case 1:
                 new LGSnackbar.LGSnackbarBuilder(getApplicationContext(), text)
                         .duration(3000)
-                        .actionTextColor(Color.RED)
-                        .backgroundColor(Color.RED)
+                        .actionTextColor(Color.GREEN)
+                        .backgroundColor(Color.GREEN)
                         .minHeightDp(50)
                         .textColor(Color.WHITE)
-                        .iconID(R.drawable.ic_custom_error)
+                        .iconID(R.drawable.ic_check_black_24dp)
                         .callback(null)
                         .action(null)
                         .show();
@@ -429,7 +465,199 @@ public class send extends AppCompatActivity {
         }
 
     }
+    public void onRadioButtonClicked(View v){
+        boolean checked = ((RadioButton) v).isChecked();
 
+        // Check which radio button was clicked
+        switch(v.getId()) {
+            case R.id.delivery:
+                if (checked) {
+                    findViewById(R.id.hora_layout).setVisibility(View.GONE);
+                    findViewById(R.id.fecha_layout).setVisibility(View.GONE);
+                    break;
+                }
+            case R.id.pasar_a_buscar:
+                if (checked) {
+
+                    findViewById(R.id.hora_layout).setVisibility(View.VISIBLE);
+                    findViewById(R.id.fecha_layout).setVisibility(View.VISIBLE);
+                    break;
+                }
+        }
+    }
+    @SuppressLint("ValidFragment")
+    public class TimePickerFragment extends DialogFragment
+            implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current time as the default values for the picker
+            final Calendar c = Calendar.getInstance();
+            mhour = c.get(Calendar.HOUR_OF_DAY);
+            mminute = c.get(Calendar.MINUTE);
+
+
+            // Create a new instance of TimePickerDialog and return it
+            return new TimePickerDialog(getActivity(), this, mhour, mminute,
+                    DateFormat.is24HourFormat(getActivity()));
+        }
+
+        @SuppressLint("StaticFieldLeak")
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            String hora_prog  = String.valueOf(hourOfDay);
+            String min_prog  = String.valueOf(minute);
+            hour_select = hourOfDay;
+            minute_select = minute;
+            if(hourOfDay<10){
+                hora_prog = "0"+hora_prog;
+            }
+            if(minute<10){
+                min_prog = "0"+min_prog;
+            }
+            hora_sel = hora_prog+":"+min_prog;
+            TextView h = findViewById(R.id.hora);
+            h.setText(hora_prog+":"+min_prog+" hs.");
+
+
+
+        }
+
+    }
+
+    private class task extends AsyncTask<Integer, String, String> {
+        ProgressDialog progress = new ProgressDialog(send.this);
+        protected String doInBackground(Integer... integers) {
+
+            int myear = integers[2];
+            int mmonth = integers[1];
+            int mday = integers[0];
+            int year = integers[5];
+            int month = integers[4];
+            int day = integers[3];
+            int hour = integers[6];
+            int min = integers[7];
+            int mhour = integers[8];
+            int mmin = integers[9];
+            final SntpClient client = new SntpClient();
+            this.publishProgress();
+            if (client.requestTime("py.pool.ntp.org", 10000)) {
+                long now = client.getNtpTime() + SystemClock.elapsedRealtime() - client.getNtpTimeReference();
+                Calendar time = Calendar.getInstance();
+                time.setTimeInMillis(now);
+                myear = time.get(Calendar.YEAR);
+                mmonth = time.get(Calendar.MONTH);
+                mday = time.get(Calendar.DAY_OF_MONTH);
+                mhour = time.get(Calendar.HOUR_OF_DAY);
+                mmin = time.get(Calendar.MINUTE);
+                Log.e("consultaNTP","successful");
+            }
+            else{
+                Log.e("consultaNTP","ERROR: Request unsuccessful");
+            }
+
+            if (year<myear){
+                aux_fecha = false;
+                return ("seleccione un nuevo año, 'pasar a buscar' ");
+            }
+            else if (month<mmonth && year==myear) {
+                aux_fecha = false;
+                return ("mes ya pasado seleccionado, 'pasar a buscar' ");
+
+            }
+            else if (day<mday && month==mmonth && year==myear) {
+                aux_fecha = false;
+                return ("dia ya pasado seleccionado, 'pasar a buscar' ");
+            }
+            else if (day==mday && month==mmonth && year==myear){
+                if (mhour<hour){
+                    aux_hora = true;
+                }
+                else if (mhour==hour){
+                    if (min>mmin){
+                        aux_hora = true;
+                    }
+                    else {
+                        aux_hora = false;
+                        return ("seleccione una nuevo minuto, 'pasar a buscar' ");
+                    }
+                }
+                else {
+                    aux_hora = false;
+                    return ("seleccione una nueva hora, 'pasar a buscar' ");
+                }
+            }
+            else {
+                try {
+                    datos.put("hora_sel",hora_sel);
+                    datos.put("fecha_sel",fecha_sel);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            return null;
+        }
+
+        protected void onProgressUpdate(String... value) {
+            super.onProgressUpdate(value);
+
+            progress.setTitle("Conectando");
+            progress.setMessage("Espere un momento por favor...");
+            progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+            progress.show();
+
+
+
+        }
+
+        protected void onPostExecute(String result) {
+            if (result!=null){
+                alert(result,0);
+            }
+            else {
+                enviar();
+            }
+            progress.dismiss();
+        }
+
+
+    }
+
+    @SuppressLint("ValidFragment")
+    public class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+        @SuppressLint("StaticFieldLeak")
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            myear = c.get(Calendar.YEAR);
+            mmonth= c.get(Calendar.MONTH);
+            mday= c.get(Calendar.DAY_OF_MONTH);
+            return new DatePickerDialog(getActivity(), this, myear, mmonth, mday);
+        }
+
+        @SuppressLint("StaticFieldLeak")
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            year_select = year;
+            month_select = month;
+            day_select = day;
+            fecha_sel = day+"-"+month+"-"+year;
+            TextView fecha_show = findViewById(R.id.fecha);
+            fecha_show.setText(day+"-"+"-"+month+" "+year);
+        }
+    }
+    public void time(View v){
+
+        Log.e("click","click");
+        DialogFragment newFragment = new TimePickerFragment();
+        newFragment.show(getFragmentManager(), "timePicker");
+    }
+    public void showDatePickerDialog(View v) {
+        DialogFragment newFragment = new DatePickerFragment();
+        newFragment.show(getFragmentManager(), "datePicker");
+    }
 
 
 }

@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:id="@+id/linearLayout4"
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#73fedcb5"
@@ -37,6 +37,76 @@
                 android:textAlignment="center"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|center"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/delivery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:checked="true"
+                    android:onClick="onRadioButtonClicked"
+                    android:text="Delivery" />
+
+                <RadioButton
+                    android:id="@+id/pasar_a_buscar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="onRadioButtonClicked"
+                    android:text="Pasar a buscar" />
+            </RadioGroup>
+
+            <TableRow
+                android:id="@+id/hora_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <ImageButton
+                    android:id="@+id/imageButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="time"
+                    app:srcCompat="@drawable/ic_access_time" />
+
+                <TextView
+                    android:id="@+id/hora"
+                    android:layout_width="155dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:hint="Seleccione hora"
+                    android:textSize="18sp" />
+            </TableRow>
+
+            <TableRow
+                android:id="@+id/fecha_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|center"
+                android:visibility="gone">
+
+                <ImageButton
+                    android:id="@+id/imageButton2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="showDatePickerDialog"
+                    app:srcCompat="@drawable/ic_calendar" />
+
+                <TextView
+                    android:id="@+id/fecha"
+                    android:layout_width="155dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:hint="Seleccione fecha"
+                    android:textSize="18sp" />
+            </TableRow>
 
             <studio.carbonylgroup.textfieldboxes.TextFieldBoxes
                 android:id="@+id/text_field_nombre"
@@ -128,10 +198,11 @@
 
             </studio.carbonylgroup.textfieldboxes.TextFieldBoxes>
 
+
             <LinearLayout
+                android:id="@+id/o"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
                 android:orientation="horizontal">
 
                 <CheckBox

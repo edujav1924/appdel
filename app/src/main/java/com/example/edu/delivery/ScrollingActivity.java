@@ -1,19 +1,23 @@
 package com.example.edu.delivery;
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -21,6 +25,20 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.circulardialog.CDialog;
+import com.example.circulardialog.extras.CDConstants;
 import com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker;
 import com.shashank.sony.fancydialoglib.Animation;
 import com.shashank.sony.fancydialoglib.FancyAlertDialog;
@@ -54,6 +72,7 @@ public class ScrollingActivity extends AppCompatActivity {
     customadapterlist madapter;
     JSONArray jsondata;
     String position;
+    int total=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +95,7 @@ public class ScrollingActivity extends AppCompatActivity {
 
     }
     public void total(){
-        int total=0;
+        total=0;
         for (int i=0;i<pedido_list.size();i++){
             total = total + precio_list.get(i);
         }
@@ -194,15 +213,64 @@ public class ScrollingActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        if (id == R.id.action_terminos) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            // Get the layout inflater
+            LayoutInflater inflater = this.getLayoutInflater();
+            final View dialog_view= inflater.inflate(R.layout.forma_de_uso, null);
+            builder.setView(dialog_view);
+            builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.cancel();
+                }
+            }).create().show();
+        }
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_quejas) {
+            /*final EditText nombre_ = findViewById(R.id.nombre_sug);
+            final EditText apellido = findViewById(R.id.apellido_sug);
+            final EditText mensaje = findViewById(R.id.mensaje_sug);*/
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            // Get the layout inflater
+            LayoutInflater inflater = this.getLayoutInflater();
+            final View dialog_view= inflater.inflate(R.layout.content_reclamos, null);
+            builder.setView(dialog_view);
+
+
+            builder.setPositiveButton("enviar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        EditText nombre = dialog_view.findViewById(R.id.nombre_sug);
+                        EditText apellido = dialog_view.findViewById(R.id.apellido_sug);
+                        EditText mensaje = dialog_view.findViewById(R.id.mensaje_sug);
+                        if (!nombre.getText().toString().equals("") &&
+                                !apellido.getText().toString().equals("") &&
+                                !mensaje.getText().toString().equals("")){
+                            enviar_comentario(nombre.getText().toString(),apellido.getText().toString(),mensaje.getText().toString());
+                        }
+                        else {
+                            alert("Existen campos vacios",0);
+                        }
+
+                    }
+                }).setTitle("Formulario").setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+
             return true;
         }
         if(id == R.id.action_send){
             if(!pedido_list.isEmpty()){
                 JSONObject customobj = new JSONObject();
                 try {
+                    customobj.put("precio_total",total);
                     customobj.put("latitud", getIntent().getExtras().getString("latitud"));
                     customobj.put("longitud", getIntent().getExtras().getString("longitud"));
                     customobj.put("empresa",jsondata.getJSONObject(Integer.parseInt(position)).getString("empresa"));
@@ -252,6 +320,82 @@ public class ScrollingActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void enviar_comentario(String nombre, String apellido, String mensaje) {
+        JSONObject dato = new JSONObject();
+        try {
+            dato.put("nombre",nombre);
+            dato.put("apellido",apellido);
+            dato.put("mensaje",mensaje);
+            volley_post(dato);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            alert("error al compilar datos",0);
+        }
+
+    }
+    private void volley_post(JSONObject dato){
+        RequestQueue request = Volley.newRequestQueue(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, "https://delivery.simplelectronica.com/comentarios",dato, new Response.Listener<JSONObject>()
+        {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response.toString());
+                    String valor = jsonObject.getString("status");
+                    Log.e("respnse",valor);
+                    if (valor.equals("exitoso")){
+                        new CDialog(ScrollingActivity.this).createAlert(valor,
+                                CDConstants.SUCCESS,   // Type of dialog
+                                CDConstants.LARGE)    //  size of dialog
+                                .setAnimation(CDConstants.SCALE_FROM_RIGHT_TO_LEFT)     //  Animation for enter/exit
+                                .setDuration(3000)   // in milliseconds
+                                .setTextSize(CDConstants.NORMAL_TEXT_SIZE)  // CDConstants.LARGE_TEXT_SIZE, CDConstants.NORMAL_TEXT_SIZE
+                                .show();
+
+                    }else {
+                        new CDialog(ScrollingActivity.this).createAlert(valor,
+                                CDConstants.WARNING,   // Type of dialog
+                                CDConstants.LARGE)    //  size of dialog
+                                .setAnimation(CDConstants.SCALE_FROM_RIGHT_TO_LEFT)     //  Animation for enter/exit
+                                .setDuration(3000)   // in milliseconds
+                                .setTextSize(CDConstants.NORMAL_TEXT_SIZE)  // CDConstants.LARGE_TEXT_SIZE, CDConstants.NORMAL_TEXT_SIZE
+                                .show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    alert("error al enviar pedido",0);
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                if (error instanceof TimeoutError) {
+                    alert("Error al conectar con el servidor",0);
+                }else if (error instanceof NoConnectionError){
+                    alert("falla de internet",0);
+                }
+                else if (error instanceof AuthFailureError) {
+                    alert("Error de autenticacion",0);
+
+                } else if (error instanceof ServerError) {
+
+                    alert("Error interna del servidor",0);
+
+                } else if (error instanceof NetworkError) {
+
+                    alert("Error de conexion",0);
+                } else if (error instanceof ParseError) {
+
+                    alert("Error de formato de datos",0);
+                }
+            }
+        });
+
+        request.add(jsonObjectRequest);
+    }
     public static class Utility {
         static void setListViewHeightBasedOnChildren(ListView listView) {
             ListAdapter listAdapter = listView.getAdapter();
@@ -275,29 +419,7 @@ public class ScrollingActivity extends AppCompatActivity {
         }
     }
     private void showAlert(final int id) {
-       /* final android.support.v7.app.AlertDialog.Builder dialog = new android.support.v7.app.AlertDialog.Builder(this);
-        dialog.setTitle("Pedido")
-                .setMessage("Desea quitar '"+cant_list.get(id)+" "+pedido_list.get(id)+"'s de la lista de pedidos?")
-                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                        pedido_list.remove(id);
-                        precio_list.remove(id);
-                        cant_list.remove(id);
-                        total();
-                        listviews();
-                        Utility.setListViewHeightBasedOnChildren(pedidos_seleccionados);
 
-
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-
-                    }
-                });
-        dialog.show();*/
         new FancyAlertDialog.Builder(this)
                 .setTitle("Pedido")
                 .setBackgroundColor(Color.parseColor("#42a1f4"))  //Don't pass R.color.colorvalue
@@ -329,6 +451,35 @@ public class ScrollingActivity extends AppCompatActivity {
                 })
                 .build();
 
+
+    }
+    public void alert(String text, int type){
+        switch (type){
+            case 0:
+                new LGSnackbar.LGSnackbarBuilder(getApplicationContext(), text)
+                        .duration(3000)
+                        .actionTextColor(Color.RED)
+                        .backgroundColor(Color.RED)
+                        .minHeightDp(50)
+                        .textColor(Color.WHITE)
+                        .iconID(R.drawable.ic_custom_error)
+                        .callback(null)
+                        .action(null)
+                        .show();
+                break;
+            case 1:
+                new LGSnackbar.LGSnackbarBuilder(getApplicationContext(), text)
+                        .duration(3000)
+                        .actionTextColor(Color.GREEN)
+                        .backgroundColor(Color.GREEN)
+                        .minHeightDp(50)
+                        .textColor(Color.WHITE)
+                        .iconID(R.drawable.ic_check_black_24dp)
+                        .callback(null)
+                        .action(null)
+                        .show();
+                break;
+        }
 
     }
 

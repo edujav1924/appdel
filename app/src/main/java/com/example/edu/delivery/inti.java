@@ -23,6 +23,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -142,7 +144,9 @@ public class inti extends AppCompatActivity  {
         c.moveToFirst();
         Log.e("valor de C", String.valueOf(c.getCount()));
         if(c.getCount()>0){
+            Log.e("bandera",c.getString(1));
             if(c.getString(1).equals("1")){
+
                 bandera = true;
             }
             c.close();
@@ -282,7 +286,10 @@ public class inti extends AppCompatActivity  {
                             latitud = latitud.replace(',', '.');
                             longitud = longitud.replace(',', '.');
                         }
-
+                        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER )) {
+                            stopLocationUpdates();
+                            locationnet.setText("active su gps kp");
+                        }
                         locationnet.setText("aproximando a: " + String.valueOf(location.getAccuracy()) + " metros");
                         if (location.getAccuracy() <= 25.0) {
                             stopLocationUpdates();
@@ -303,14 +310,23 @@ public class inti extends AppCompatActivity  {
     @Override
     public void onPause() {
         super.onPause();  // Always call the superclass method first
+        Log.e("pausa","pausa");
 
 
     }
     @Override
     public void onRestart() {
         super.onRestart();  // Always call the superclass method first
+        Log.e("restart","restart");
 
-
+    }
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        Log.e("onback","presed");
+        if (!respuesta_term()){
+            this.finish();
+        }
     }
 
     @Override
@@ -318,7 +334,6 @@ public class inti extends AppCompatActivity  {
         super.onDestroy();
         if(band)
             stopLocationUpdates();
-
     }
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
@@ -329,7 +344,6 @@ public class inti extends AppCompatActivity  {
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
         task.addOnFailureListener(this, new OnFailureListener() {
-
             @Override
             public void onFailure(@NonNull Exception e) {
                 if (e instanceof ResolvableApiException) {
@@ -569,44 +583,45 @@ public class inti extends AppCompatActivity  {
     }
     private void alert_term(){
         boolean wrapInScrollView = true;
-        new MaterialDialog.Builder(this)
-                .title("Informacion Importante")
-                .customView(R.layout.forma_de_uso, false)
-                .positiveText("acepto")
-                .negativeText("Rechazo")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(MaterialDialog dialog, DialogAction which) {
-                        basedatos bd = new basedatos(inti.this);
-                        SQLiteDatabase db = bd.getWritableDatabase();
-                        ContentValues values = new ContentValues();
-                        values.put(basedatos.info.COLUMN_CHECK, String.valueOf(1));
-                        long newRowId = db.insert(basedatos.info.TABLE_NAME, null, values);
-                        db.close();
-                        basedatos mDbHelper = new basedatos(inti.this);
-                        obtener_ubicaciones(mDbHelper);
-                        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(inti.this);
-                        flag=false;
-                        Log.e("terminos","acepto");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // Get the layout inflater
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialog_view= inflater.inflate(R.layout.forma_de_uso, null);
+        builder.setView(dialog_view);
+        builder.setPositiveButton("Acepto", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                basedatos bd = new basedatos(inti.this);
+                SQLiteDatabase db = bd.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                values.put(basedatos.info.COLUMN_CHECK, String.valueOf(1));
+                long newRowId = db.insert(basedatos.info.TABLE_NAME, null, values);
+                db.close();
+                basedatos mDbHelper = new basedatos(inti.this);
+                obtener_ubicaciones(mDbHelper);
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(inti.this);
+                flag=false;
+                Log.e("terminos","acepto");
 
-                    }
-                })
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(MaterialDialog dialog, DialogAction which) {
-                        basedatos bd = new basedatos(inti.this);
-                        SQLiteDatabase db = bd.getWritableDatabase();
-                        ContentValues values = new ContentValues();
-                        values.put(basedatos.info.COLUMN_CHECK, String.valueOf(0));
-                        long newRowId = db.insert(basedatos.info.TABLE_NAME, null, values);
-                        db.close();
-                        Log.e("terminos","rechazo");
-                        finish();
+            }
+        }).setNegativeButton("Rechazo", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.e("terminos","rechazo");
+                finish();
+            }
+        }).setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+                if (i == KeyEvent.KEYCODE_BACK) {
+                    dialogInterface.cancel();
+                    inti.this.finish();
 
-                    }
-                })
-                .show();
-                
+                }
+                return true;
+            }
+        }).create().show();
+
     }
 
 

@@ -121,17 +121,6 @@ public class BusquedaActivity extends AppCompatActivity{
     getMenuInflater().inflate(R.menu.mymenu, menu);
     MenuItem item = menu.findItem(R.id.action_search);
     searchView.setMenuItem(item);
-    MenuItem loc = menu.findItem(R.id.location);
-    loc.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem) {
-            Log.e("sd","pulsado");
-            Uri uri = Uri.parse("https://www.google.com/maps/d/viewer?mid=136OvfGkpWnvZP6G1uDAmw_AWx-1JNHqJ&ll=-25.28863824629068%2C-57.51148585000004&z=15");
-            Intent newintent = new Intent(Intent.ACTION_VIEW,uri);
-            startActivity(newintent);
-            return false;
-        }
-    });
     return true;
     }
 
